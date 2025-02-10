@@ -1,0 +1,143 @@
+>> DecisionTree: 2.7061 s
+ * ccp_alpha: 0.0
+ * class_weight: None
+ * criterion: gini
+ * max_depth: None
+ * max_features: None
+ * max_leaf_nodes: None
+ * min_impurity_decrease: 0.0
+ * min_samples_leaf: 1
+ * min_samples_split: 2
+ * min_weight_fraction_leaf: 0.0
+ * random_state: 42
+ * splitter: best
+
+>> RandomForest: 3.3887 s
+ * bootstrap: True
+ * ccp_alpha: 0.0
+ * class_weight: None
+ * criterion: gini
+ * max_depth: None
+ * max_features: auto
+ * max_leaf_nodes: None
+ * max_samples: None
+ * min_impurity_decrease: 0.0
+ * min_samples_leaf: 1
+ * min_samples_split: 2
+ * min_weight_fraction_leaf: 0.0
+ * n_estimators: 50
+ * n_jobs: None
+ * oob_score: False
+ * random_state: 42
+ * verbose: 0
+ * warm_start: False
+
+>> XGBoost: 8.5860 s
+ * objective: multi:softprob
+ * use_label_encoder: False
+ * base_score: 0.5
+ * booster: gbtree
+ * callbacks: None
+ * colsample_bylevel: 1
+ * colsample_bynode: 1
+ * colsample_bytree: 1
+ * early_stopping_rounds: None
+ * enable_categorical: False
+ * eval_metric: logloss
+ * gamma: 0
+ * gpu_id: -1
+ * grow_policy: depthwise
+ * importance_type: None
+ * interaction_constraints: 
+ * learning_rate: 0.1
+ * max_bin: 256
+ * max_cat_to_onehot: 4
+ * max_delta_step: 0
+ * max_depth: 3
+ * max_leaves: 0
+ * min_child_weight: 1
+ * missing: nan
+ * monotone_constraints: ()
+ * n_estimators: 50
+ * n_jobs: 0
+ * num_parallel_tree: 1
+ * predictor: auto
+ * random_state: 42
+ * reg_alpha: 0
+ * reg_lambda: 1
+ * sampling_method: uniform
+ * scale_pos_weight: None
+ * subsample: 1
+ * tree_method: exact
+ * validate_parameters: 1
+ * verbosity: None
+
+>> AdaBoost: 17.6591 s
+ * algorithm: SAMME.R
+ * base_estimator__ccp_alpha: 0.0
+ * base_estimator__class_weight: None
+ * base_estimator__criterion: gini
+ * base_estimator__max_depth: 7
+ * base_estimator__max_features: None
+ * base_estimator__max_leaf_nodes: None
+ * base_estimator__min_impurity_decrease: 0.0
+ * base_estimator__min_samples_leaf: 1
+ * base_estimator__min_samples_split: 2
+ * base_estimator__min_weight_fraction_leaf: 0.0
+ * base_estimator__random_state: None
+ * base_estimator__splitter: best
+ * base_estimator: DecisionTreeClassifier(max_depth=7)
+ * learning_rate: 1.0
+ * n_estimators: 10
+ * random_state: 42
+
+>> SVM: 4.2518 s
+ * C: 0.5
+ * break_ties: False
+ * cache_size: 200
+ * class_weight: None
+ * coef0: 0.0
+ * decision_function_shape: ovr
+ * degree: 3
+ * gamma: scale
+ * kernel: rbf
+ * max_iter: -1
+ * probability: False
+ * random_state: 42
+ * shrinking: True
+ * tol: 0.001
+ * verbose: False
+
+>> LightGBM: 3.1800 s
+ * boosting_type: gbdt
+ * class_weight: None
+ * colsample_bytree: 1.0
+ * importance_type: split
+ * learning_rate: 0.1
+ * max_depth: -1
+ * min_child_samples: 20
+ * min_child_weight: 0.001
+ * min_split_gain: 0.0
+ * n_estimators: 50
+ * n_jobs: None
+ * num_leaves: 31
+ * objective: multiclass
+ * random_state: 42
+ * reg_alpha: 0.0
+ * reg_lambda: 0.0
+ * subsample: 1.0
+ * subsample_for_bin: 200000
+ * subsample_freq: 0
+ * metric: multi_logloss
+
+
+
+
+Model                |   Accuracy |   Macro F1 |   Micro F1
+------------------------------------------------------------
+DecisionTree         |    0.86223 |    0.85947 |    0.86223
+RandomForest         |    0.91992 |    0.91731 |    0.91992
+XGBoost              |    0.92840 |    0.92715 |    0.92840
+AdaBoost             |    0.88666 |    0.88595 |    0.88666
+SVM                  |    0.94435 |    0.94366 |    0.94435
+LightGBM             |    0.92840 |    0.92781 |    0.92840
