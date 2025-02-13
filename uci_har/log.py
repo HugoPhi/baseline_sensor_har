@@ -85,11 +85,15 @@ def compare_params(old_params, new_params):
 
 
 class Color:
-    def red(text):
-        return f"\033[41;30m{text}\033[0m"
-
+    @staticmethod
     def green(text):
-        return f"\033[42;30m{text}\033[0m"
+        # 使用102表示浅绿色背景
+        return "\033[102;30m{}\033[0m".format(text)  # 浅绿色背景，黑色字体
+
+    @staticmethod
+    def red(text):
+        # 使用101表示浅红色背景
+        return "\033[101;30m{}\033[0m".format(text)  # 浅红色背景，黑色字体
 
 
 def main(old_log, new_log):
@@ -118,6 +122,7 @@ def main(old_log, new_log):
     for model in param_changes.keys():
         old_metrics_row = old_metrics.get(model, {})
         new_metrics_row = new_metrics.get(model, {})
+
         accuracy_old = old_metrics_row.get('Accuracy', 0)
         accuracy_new = new_metrics_row.get('Accuracy', 0)
         accuracy_delta = (accuracy_new - accuracy_old) * 100
@@ -131,10 +136,10 @@ def main(old_log, new_log):
         time_new = new_metrics_row.get('Time Cost', 0)
         time_delta = (time_new - time_old) / time_old
 
-        accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} " + (Color.green(f"({accuracy_delta:+.2f}%)") if accuracy_delta > 0 else Color.red(f"({accuracy_delta:+.2f}%)"))
-        macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} " + (Color.green(f"({macro_f1_delta:+.2f}%)") if macro_f1_delta > 0 else Color.red(f"({macro_f1_delta:+.2f}%)"))
-        micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} " + (Color.green(f"({micro_f1_delta:+.2f}%)") if micro_f1_delta > 0 else Color.red(f"({micro_f1_delta:+.2f}%)"))
-        time_str = f"{time_old:.5f} s -> {time_new:.5f} s " + (Color.green(f"({time_delta:+.2f}%)") if time_delta > 0 else Color.red(f"({time_delta:+.2f}%)"))
+        accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} (" + (Color.green(f"{accuracy_delta:+.2f}%") if accuracy_delta > 0 else Color.red(f"{accuracy_delta:+.2f}%")) + ")"
+        macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} (" + (Color.green(f"{macro_f1_delta:+.2f}%") if macro_f1_delta > 0 else Color.red(f"{macro_f1_delta:+.2f}%")) + ")"
+        micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} (" + (Color.green(f"{micro_f1_delta:+.2f}%") if micro_f1_delta > 0 else Color.red(f"{micro_f1_delta:+.2f}%")) + ")"
+        time_str = f"{time_old:.5f} s -> {time_new:.5f} s (" + (Color.green(f"{time_delta:+.2f}%") if time_delta > 0 else Color.red(f"{time_delta:+.2f}%")) + ")"
 
         table += f"{model:<20} | {accuracy_str:>20} | {macro_f1_str:>20} | {micro_f1_str:>20} | {time_str:>20}" + '\n'
 
