@@ -1,4 +1,4 @@
->> DecisionTree: 2.6766 s
+>> DecisionTree: 2.5609 s
  * ccp_alpha: 0.0
  * class_weight: None
  * criterion: gini
@@ -6,13 +6,13 @@
  * max_features: None
  * max_leaf_nodes: None
  * min_impurity_decrease: 0.0
- * min_samples_leaf: 1
+ * min_samples_leaf: 3
  * min_samples_split: 2
  * min_weight_fraction_leaf: 0.0
  * random_state: 42
  * splitter: best
 
->> RandomForest: 6.6704 s
+>> RandomForest: 6.4800 s
  * bootstrap: True
  * ccp_alpha: 0.0
  * class_weight: None
@@ -23,7 +23,7 @@
  * max_samples: None
  * min_impurity_decrease: 0.0
  * min_samples_leaf: 1
- * min_samples_split: 2
+ * min_samples_split: 4
  * min_weight_fraction_leaf: 0.0
  * n_estimators: 100
  * n_jobs: None
@@ -32,7 +32,7 @@
  * verbose: 0
  * warm_start: False
 
->> XGBoost: 16.6114 s
+>> XGBoost: 22.6533 s
  * objective: multi:softprob
  * use_label_encoder: False
  * base_score: 0.5
@@ -53,7 +53,7 @@
  * max_bin: 256
  * max_cat_to_onehot: 4
  * max_delta_step: 0
- * max_depth: 3
+ * max_depth: 5
  * max_leaves: 0
  * min_child_weight: 1
  * missing: nan
@@ -72,7 +72,7 @@
  * validate_parameters: 1
  * verbosity: None
 
->> AdaBoost: 20.4991 s
+>> AdaBoost: 171.9216 s
  * algorithm: SAMME.R
  * base_estimator__ccp_alpha: 0.0
  * base_estimator__class_weight: None
@@ -88,11 +88,11 @@
  * base_estimator__splitter: best
  * base_estimator: DecisionTreeClassifier(max_depth=7)
  * learning_rate: 1.0
- * n_estimators: 10
+ * n_estimators: 100
  * random_state: 42
 
->> SVM: 4.3765 s
- * C: 1.0
+>> SVM: 3.9940 s
+ * C: 0.5
  * break_ties: False
  * cache_size: 200
  * class_weight: None
@@ -108,7 +108,7 @@
  * tol: 0.001
  * verbose: False
 
->> LightGBM: 6.3689 s
+>> LightGBM: 5.7432 s
  * boosting_type: gbdt
  * class_weight: None
  * colsample_bytree: 1.0
@@ -120,7 +120,7 @@
  * min_split_gain: 0.0
  * n_estimators: 100
  * n_jobs: None
- * num_leaves: 31
+ * num_leaves: 30
  * objective: multiclass
  * random_state: 42
  * reg_alpha: 0.0
@@ -135,9 +135,9 @@
 
 Model                |   Accuracy |   Macro F1 |   Micro F1
 ------------------------------------------------------------
-DecisionTree         |    0.86223 |    0.85947 |    0.86223
-RandomForest         |    0.92738 |    0.92537 |    0.92738
-XGBoost              |    0.94062 |    0.93989 |    0.94062
-AdaBoost             |    0.88633 |    0.88569 |    0.88633
-SVM                  |    0.95046 |    0.94991 |    0.95046
-LightGBM             |    0.93180 |    0.93128 |    0.93180
+DecisionTree         |    0.86054 |    0.85744 |    0.86054
+RandomForest         |    0.92806 |    0.92612 |    0.92806
+XGBoost              |    0.93383 |    0.93299 |    0.93383
+AdaBoost             |    0.93112 |    0.93012 |    0.93112
+SVM                  |    0.94435 |    0.94366 |    0.94435
+LightGBM             |    0.93383 |    0.93337 |    0.93383

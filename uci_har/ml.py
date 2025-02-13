@@ -12,7 +12,7 @@ from xgboost import XGBClassifier
 from sklearn.svm import SVC
 
 SEED = 42
-LOG_IX = 1
+LOG_IX = 2
 LOG = f'./log/result{LOG_IX}.log'
 if os.path.exists(LOG):
     print(f"File {LOG} already exists.")
@@ -22,28 +22,33 @@ else:
         os.makedirs('./log')
     open(LOG, 'a').close()
 
-models = {
+
+MODELS = dict()
+for n in range(50, 500, 50):
+    MODELS[f"RF: {n}"] = RandomForestClassifier(n_estimators=n, random_state=SEED)
+
+MODELS2 = {
     "DecisionTree": DecisionTreeClassifier(
         criterion='gini',     # 分裂质量的评价标准
         max_depth=None,       # 树的最大深度
         min_samples_split=2,  # 内部节点再划分所需最小样本数
-        min_samples_leaf=1,   # 叶节点所需的最小样本数
+        min_samples_leaf=3,   # 叶节点所需的最小样本数
         random_state=SEED     # 控制随机性以便结果可复现
     ),
 
     "RandomForest": RandomForestClassifier(
-        n_estimators=50,     # 树的数量
+        n_estimators=100,     # 树的数量
         criterion='gini',     # 分裂质量的评价标准
         max_depth=None,       # 树的最大深度
-        min_samples_split=2,  # 内部节点再划分所需最小样本数
+        min_samples_split=4,  # 内部节点再划分所需最小样本数
         min_samples_leaf=1,   # 叶节点所需的最小样本数
         bootstrap=True,       # 是否进行bootstrap采样
         random_state=SEED     # 控制随机性以便结果可复现
     ),
 
     "XGBoost": XGBClassifier(
-        n_estimators=50,             # 树的数量
-        max_depth=3,                  # 树的最大深度
+        n_estimators=100,             # 树的数量
+        max_depth=5,                  # 树的最大深度
         learning_rate=0.1,            # 学习率
         subsample=1,                  # 训练每棵树时使用的样本比例
         colsample_bytree=1,           # 建树的特征比例
@@ -54,7 +59,7 @@ models = {
 
     "AdaBoost": AdaBoostClassifier(
         base_estimator=DecisionTreeClassifier(max_depth=7),   # 弱学习器
-        n_estimators=10,    # 弱学习器的数量
+        n_estimators=100,    # 弱学习器的数量
         learning_rate=1.,   # 对每个弱学习器的贡献程度
         random_state=SEED   # 控制随机性以便结果可复现
     ),
@@ -69,10 +74,10 @@ models = {
     ),
 
     "LightGBM": LGBMClassifier(
-        n_estimators=50,        # 树的数量
+        n_estimators=100,        # 树的数量
         max_depth=-1,            # 树的最大深度（-1表示没有限制）
         learning_rate=0.1,       # 学习率
-        num_leaves=31,           # 一棵树上的叶子数
+        num_leaves=30,           # 一棵树上的叶子数
         subsample=1.0,           # 训练每棵树时使用的样本比例
         colsample_bytree=1.0,    # 建树的特征比例
         objective='multiclass',  # 目标函数
@@ -110,7 +115,7 @@ print(f"train: {len(X_train)}, test: {len(X_test)}")
 X_train, y_train = X_train[shuffle], y_train[shuffle]
 
 
-def train(model="DecisionTree", models=models):
+def train(models, model="DecisionTree"):
     if model in models.keys():
         if model == "XGBoost":
             models[model].fit(X_train, y_train.ravel() - 1)
@@ -125,10 +130,11 @@ def train(model="DecisionTree", models=models):
 
 
 model_res = dict()
+models = MODELS2
 for name in models.keys():
     print(f">> {name}: ", end="")
     start = time.time()
-    y_pred = train(name)
+    y_pred = train(models=models, model=name)
     end = time.time()
     print(f"{end - start:.4f} s")
 
