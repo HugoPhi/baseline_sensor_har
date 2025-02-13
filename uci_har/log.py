@@ -84,31 +84,25 @@ def compare_params(old_params, new_params):
     return changes
 
 
-def compare_metrics(old_metrics, new_metrics):
-    changes = {}
-    all_models = set(old_metrics.keys()).union(new_metrics.keys())
-    for model in all_models:
-        old = old_metrics.get(model, {})
-        new = new_metrics.get(model, {})
-        model_changes = {}
-        for metric in ['Accuracy', 'Macro F1', 'Micro F1', 'Time Cost']:
-            old_val = old.get(metric)
-            new_val = new.get(metric)
-            if old_val is not None and new_val is not None and old_val != new_val:
-                delta = new_val - old_val
-                delta_percent = (delta / old_val) * 100 if old_val != 0 else 0
-                model_changes[metric] = (old_val, new_val, delta_percent)
-        if model_changes:
-            changes[model] = model_changes
-    return changes
+class Color:
+    def red(text):
+        return f"\033[41;30m{text}\033[0m"
+
+    def green(text):
+        return f"\033[42;30m{text}\033[0m"
 
 
 def main(old_log, new_log):
     old_params, old_metrics = parse_log(old_log)
     new_params, new_metrics = parse_log(new_log)
+    # import json
+    # json_str1 = json.dumps(old_params, sort_keys=True, indent=2)
+    # json_str2 = json.dumps(new_params, sort_keys=True, indent=2)
+    # print(json_str1)
+    # print(json_str2)
+    # exit(0)
 
     param_changes = compare_params(old_params, new_params)
-    metric_changes = compare_metrics(old_metrics, new_metrics)
 
     print("% 参数变化：")
     for model, changes in param_changes.items():
@@ -119,9 +113,9 @@ def main(old_log, new_log):
             print(f"    * {param}: {old_str} → {new_str}")
 
     print("\n% 指标变化：")
-    print(f"{'Model':<20} | {'Accuracy':>27} | {'Macro F1':>27} | {'Micro F1':>27} | {'Time Cost':>27}")
-    print("-" * 140)
-    for model, changes in metric_changes.items():
+    table = f"{'Model':<20} | {'Accuracy':>27} | {'Macro F1':>27} | {'Micro F1':>27} | {'Time Cost':>27}\n"
+    table += "-" * 140 + '\n'
+    for model in param_changes.keys():
         old_metrics_row = old_metrics.get(model, {})
         new_metrics_row = new_metrics.get(model, {})
         accuracy_old = old_metrics_row.get('Accuracy', 0)
@@ -137,18 +131,20 @@ def main(old_log, new_log):
         time_new = new_metrics_row.get('Time Cost', 0)
         time_delta = (time_new - time_old) / time_old
 
-        accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} ({accuracy_delta:+.2f}%)"
-        macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} ({macro_f1_delta:+.2f}%)"
-        micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} ({micro_f1_delta:+.2f}%)"
-        time_str = f"{time_old:.5f} s -> {time_new:.5f} s ({time_delta:+.2f})"
+        accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} " + (Color.green(f"({accuracy_delta:+.2f}%)") if accuracy_delta > 0 else Color.red(f"({accuracy_delta:+.2f}%)"))
+        macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} " + (Color.green(f"({macro_f1_delta:+.2f}%)") if macro_f1_delta > 0 else Color.red(f"({macro_f1_delta:+.2f}%)"))
+        micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} " + (Color.green(f"({micro_f1_delta:+.2f}%)") if micro_f1_delta > 0 else Color.red(f"({micro_f1_delta:+.2f}%)"))
+        time_str = f"{time_old:.5f} s -> {time_new:.5f} s " + (Color.green(f"({time_delta:+.2f}%)") if time_delta > 0 else Color.red(f"({time_delta:+.2f}%)"))
 
-        print(f"{model:<20} | {accuracy_str:>20} | {macro_f1_str:>20} | {micro_f1_str:>20} | {time_str:>20}")
+        table += f"{model:<20} | {accuracy_str:>20} | {macro_f1_str:>20} | {micro_f1_str:>20} | {time_str:>20}" + '\n'
+
+    print(table)
 
 
 if __name__ == "__main__":
     import sys
     if len(sys.argv) != 3:
-        print("Usage: python script.py <old_log> <new_log>")
+        print("Usage: python log.py <old_log> <new_log>")
         sys.exit(1)
     else:
         print(f"# {sys.argv[1]} -> {sys.argv[2]}\n\n")
