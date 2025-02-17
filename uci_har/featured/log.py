@@ -1,3 +1,21 @@
+import os
+
+
+class Logger:
+    def __init__(self, log_dir='./log'):
+        self.log_dir = log_dir
+        if not os.path.exists('./log'):
+            os.makedirs('./log')
+
+        files = os.listdir(self.log_dir)
+        log_files = [f for f in files if f.endswith('.log')]
+        log_files.sort()
+
+    def write(self, content):
+        with open(self.log_dir, 'a') as f:
+            f.write(content)
+
+
 def parse_log(file_path):
     params = {}
     metrics = {}
@@ -139,7 +157,7 @@ def main(old_log, new_log):
         accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} (" + (Color.green(f"{accuracy_delta:+.2f}%") if accuracy_delta > 0 else Color.red(f"{accuracy_delta:+.2f}%")) + ")"
         macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} (" + (Color.green(f"{macro_f1_delta:+.2f}%") if macro_f1_delta > 0 else Color.red(f"{macro_f1_delta:+.2f}%")) + ")"
         micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} (" + (Color.green(f"{micro_f1_delta:+.2f}%") if micro_f1_delta > 0 else Color.red(f"{micro_f1_delta:+.2f}%")) + ")"
-        time_str = f"{time_old:.5f} s -> {time_new:.5f} s (" + (Color.green(f"{time_delta:+.2f}%") if time_delta > 0 else Color.red(f"{time_delta:+.2f}%")) + ")"
+        time_str = f"{time_old:.5f} s -> {time_new:.5f} s (" + (Color.green(f"{time_delta * 100:+.2f}%") if time_delta > 0 else Color.red(f"{time_delta * 100:+.2f}%")) + ")"
 
         table += f"{model:<20} | {accuracy_str:>20} | {macro_f1_str:>20} | {micro_f1_str:>20} | {time_str:>20}" + '\n'
 

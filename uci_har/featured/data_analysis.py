@@ -94,7 +94,7 @@ class DataAnalysis:
 # DataAnalysis(X_train[RANGE])
 
 Y_train = pd.read_csv(
-    "./data/train/y_train.txt",
+    "../data/train/y_train.txt",
     sep=r'\s+',
     header=None,
     engine='python'
@@ -119,7 +119,7 @@ Y_train = pd.read_csv(
 # DataAnalysis(X_test[RANGE])
 
 Y_test = pd.read_csv(
-    "./data/test/y_test.txt",
+    "../data/test/y_test.txt",
     sep=r'\s+',
     header=None,
     engine='python'
