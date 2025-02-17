@@ -11,6 +11,7 @@ from sklearn.svm import SVC
 
 from clfs import MLClfs, MLPClf, XGBClfs
 
+LOG_IX = 3
 X_train = pd.read_csv(
     "../data/train/X_train.txt",
     sep=r'\s+',
@@ -100,8 +101,6 @@ MODELS2 = {
     )
 }
 
-SEED = 42
-LOG_IX = 2
 LOG = f'./log/result{LOG_IX}.log'
 if os.path.exists(LOG):
     print(f"File {LOG} already exists.")
