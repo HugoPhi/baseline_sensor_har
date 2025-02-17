@@ -9,7 +9,7 @@ class DataAnalysis:
         self.df = df
 
         self.info()
-        self.distribute()
+        # self.distribute()
         self.statistics()
         self.exceptions()
         self.correlation(vis=False)
@@ -78,20 +78,20 @@ class DataAnalysis:
 
 
 # 加载训练集
-# X_train = pd.read_csv(
-#     "./data/train/X_train.txt",
-#     sep=r'\s+',
-#     header=None,
-#     engine='python')
-#
-# with open('./data/features.txt', 'r') as file:
-#     headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
-#
-# X_train.columns = headers
-#
-# RANGE = [headers[x] for x in range(6)]
-#
-# DataAnalysis(X_train[RANGE])
+X_train = pd.read_csv(
+    "../data/train/X_train.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python')
+
+with open('../data/features.txt', 'r') as file:
+    headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
+
+X_train.columns = headers
+
+RANGE = [headers[x] for x in range(6)]
+
+DataAnalysis(X_train[RANGE])
 
 Y_train = pd.read_csv(
     "../data/train/y_train.txt",
@@ -100,23 +100,23 @@ Y_train = pd.read_csv(
     engine='python'
 )
 
-# DataAnalysis(Y_train)
+DataAnalysis(Y_train)
 
 # 加载测试集
-# X_test = pd.read_csv(
-#     "./data/test/X_test.txt",
-#     sep=r'\s+',
-#     header=None,
-#     engine='python')
-#
-# with open('./data/features.txt', 'r') as file:
-#     headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
-#
-# X_test.columns = headers
-#
-# RANGE = [headers[x] for x in range(6)]
-#
-# DataAnalysis(X_test[RANGE])
+X_test = pd.read_csv(
+    "../data/test/X_test.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python')
+
+with open('../data/features.txt', 'r') as file:
+    headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
+
+X_test.columns = headers
+
+RANGE = [headers[x] for x in range(6)]
+
+DataAnalysis(X_test[RANGE])
 
 Y_test = pd.read_csv(
     "../data/test/y_test.txt",
@@ -125,8 +125,8 @@ Y_test = pd.read_csv(
     engine='python'
 )
 
-# DataAnalysis(Y_test)
-np.set_printoptions(suppress=True, precision=5)
-val, train = np.unique(Y_train.to_numpy(), return_counts=True)
-_, test = np.unique(Y_test.to_numpy(), return_counts=True)
-print(np.stack((val, train, test, train / test)))
+DataAnalysis(Y_test)
+# np.set_printoptions(suppress=True, precision=5)
+# val, train = np.unique(Y_train.to_numpy(), return_counts=True)
+# _, test = np.unique(Y_test.to_numpy(), return_counts=True)
+# print(np.stack((val, train, test, train / test)))

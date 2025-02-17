@@ -20,10 +20,16 @@ class Clfs(ABC):
 
     @abstractmethod
     def predict(self):
+        '''
+        !!! 在这里要统计预测时间
+        '''
         pass
 
     @abstractmethod
     def fit(self, load=False):
+        '''
+        !!! 在这里要统计测试时间
+        '''
         pass
 
     @abstractmethod
@@ -146,8 +152,8 @@ class MLPClf(Clfs):
             loss.backward()
             self.optimizer.step()
 
-            # if epoch % 10 == 0:
-            #     print(f"Epoch: {epoch}, Loss: {loss.item()}")
+            if epoch % 10 == 0:
+                print(f"Epoch: {epoch}, Loss: {loss.item()}")
         end = time.time()
         self.training_time = end - start
 

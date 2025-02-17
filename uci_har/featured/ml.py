@@ -12,6 +12,7 @@ from sklearn.svm import SVC
 from clfs import MLClfs, MLPClf, XGBClfs
 
 LOG_IX = 3
+SEED = 42
 X_train = pd.read_csv(
     "../data/train/X_train.txt",
     sep=r'\s+',
@@ -41,7 +42,6 @@ print(f"train: {len(X_train)}, test: {len(X_test)}")
 X_train, y_train = X_train[shuffle], y_train[shuffle]
 
 
-SEED = 42
 MODELS2 = {
     "DecisionTree": DecisionTreeClassifier(
         criterion='gini',     # 分裂质量的评价标准
@@ -52,7 +52,7 @@ MODELS2 = {
     ),
 
     "RandomForest": RandomForestClassifier(
-        n_estimators=50,     # 树的数量
+        n_estimators=200,     # 树的数量
         criterion='gini',     # 分裂质量的评价标准
         max_depth=None,       # 树的最大深度
         min_samples_split=4,  # 内部节点再划分所需最小样本数
@@ -62,7 +62,7 @@ MODELS2 = {
     ),
 
     "XGBoost": XGBClassifier(
-        n_estimators=50,             # 树的数量
+        n_estimators=200,             # 树的数量
         max_depth=5,                  # 树的最大深度
         learning_rate=0.1,            # 学习率
         subsample=1,                  # 训练每棵树时使用的样本比例
@@ -80,7 +80,7 @@ MODELS2 = {
     # ),
 
     "SVM": SVC(
-        C=0.6,              # 正则化参数
+        C=0.4,              # 正则化参数
         kernel='rbf',       # 核函数类型
         degree=3,           # 多项式核函数的次数（'poly'时有效）
         gamma='scale',      # 核系数（对于'rbd', 'poly', 'sigmoid'有效）
@@ -89,7 +89,7 @@ MODELS2 = {
     ),
 
     "LightGBM": LGBMClassifier(
-        n_estimators=50,        # 树的数量
+        n_estimators=200,        # 树的数量
         max_depth=-1,            # 树的最大深度（-1表示没有限制）
         learning_rate=0.1,       # 学习率
         num_leaves=30,           # 一棵树上的叶子数
