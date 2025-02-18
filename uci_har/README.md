@@ -55,3 +55,38 @@ python log.py ./log/result1.log ./log/result2.log
 
 
 但是注意，只有结果变化会被显示，没有变化的不会被显示。  
+
+目前已经完成的： 
+
+- DecisionTree 
+- RandomForest 
+- XGBoost 
+- AdaBoost 
+- LightGBM 
+- SVM 
+- MLP  
+
+
+## raw 
+
+这个文件夹处理了原始数据集，但是目前进度还没有推进到制作一个比较好的日志，我们考虑结合上面的的日志系统来开发一个更加广泛的日志体系，以便于调试和分析。 
+目前已经完成的部分：  
+
+- MLP 
+- Conv2d with single channel 
+- Conv1d with multiple channels 
+
+TODO的部分: 
+
+- Basic RNN 
+- Basic LSTM 
+- Basic GRU 
+- ConvLSTM 
+- BiLSTM 
+- BiGRU 
+- ResBiLSTM [[Zhao et al. (2017)](https://arxiv.org/abs/1708.08989)]
+
+
+# Reference 
+
+- Zhao, Y., Yang, R., Chevalier, G., & Gong, M. (2017). Deep Residual Bidir-LSTM for Human Activity Recognition Using Wearable Sensors. arXiv preprint [arXiv:1708.08989](https://arxiv.org/abs/1708.08989). 

@@ -1,0 +1,90 @@
+>> DecisionTree: 3.0939 s
+ * ccp_alpha: 0.0
+ * class_weight: None
+ * criterion: gini
+ * max_depth: None
+ * max_features: None
+ * max_leaf_nodes: None
+ * min_impurity_decrease: 0.0
+ * min_samples_leaf: 3
+ * min_samples_split: 2
+ * min_weight_fraction_leaf: 0.0
+ * random_state: 42
+ * splitter: best
+
+>> RandomForest: 16.2816 s
+ * bootstrap: True
+ * ccp_alpha: 0.0
+ * class_weight: None
+ * criterion: gini
+ * max_depth: None
+ * max_features: sqrt
+ * max_leaf_nodes: None
+ * max_samples: None
+ * min_impurity_decrease: 0.0
+ * min_samples_leaf: 1
+ * min_samples_split: 4
+ * min_weight_fraction_leaf: 0.0
+ * n_estimators: 200
+ * n_jobs: None
+ * oob_score: False
+ * random_state: 42
+ * verbose: 0
+ * warm_start: False
+
+>> SVM: 1.0417 s
+ * C: 0.4
+ * break_ties: False
+ * cache_size: 200
+ * class_weight: None
+ * coef0: 0.0
+ * decision_function_shape: ovr
+ * degree: 3
+ * gamma: scale
+ * kernel: rbf
+ * max_iter: -1
+ * probability: False
+ * random_state: 42
+ * shrinking: True
+ * tol: 0.001
+ * verbose: False
+
+>> LightGBM: 4.8529 s
+ * boosting_type: gbdt
+ * class_weight: None
+ * colsample_bytree: 1.0
+ * importance_type: split
+ * learning_rate: 0.1
+ * max_depth: -1
+ * min_child_samples: 20
+ * min_child_weight: 0.001
+ * min_split_gain: 0.0
+ * n_estimators: 200
+ * n_jobs: None
+ * num_leaves: 30
+ * objective: multiclass
+ * random_state: 42
+ * reg_alpha: 0.0
+ * reg_lambda: 0.0
+ * subsample: 1.0
+ * subsample_for_bin: 200000
+ * subsample_freq: 0
+ * metric: multi_logloss
+
+>> MLP: 4.2407 s
+ * hidden_size: 561 -> 128 -> 64 -> 32 -> 6
+ * lr: 0.001
+ * optimizer: Adam
+ * loss: CrossEntropyLoss
+ * epochs: 500
+
+
+
+
+Model                |   Accuracy |   Macro F1 |   Micro F1
+------------------------------------------------------------
+DecisionTree         |    0.86054 |    0.85744 |    0.86054
+RandomForest         |    0.92738 |    0.92529 |    0.92738
+SVM                  |    0.94333 |    0.94268 |    0.94333
+LightGBM             |    0.93994 |    0.93955 |    0.93994
+MLP                  |    0.94605 |    0.94617 |    0.94605

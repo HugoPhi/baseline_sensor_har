@@ -61,16 +61,16 @@ MODELS2 = {
         random_state=SEED     # 控制随机性以便结果可复现
     ),
 
-    "XGBoost": XGBClassifier(
-        n_estimators=200,             # 树的数量
-        max_depth=5,                  # 树的最大深度
-        learning_rate=0.1,            # 学习率
-        subsample=1,                  # 训练每棵树时使用的样本比例
-        colsample_bytree=1,           # 建树的特征比例
-        objective='binary:logistic',  # 损失函数
-        eval_metric='logloss',        # 评价指标
-        random_state=SEED             # 控制随机性以便结果可复现
-    ),
+    # "XGBoost": XGBClassifier(
+    #     n_estimators=200,             # 树的数量
+    #     max_depth=5,                  # 树的最大深度
+    #     learning_rate=0.1,            # 学习率
+    #     subsample=1,                  # 训练每棵树时使用的样本比例
+    #     colsample_bytree=1,           # 建树的特征比例
+    #     objective='binary:logistic',  # 损失函数
+    #     eval_metric='logloss',        # 评价指标
+    #     random_state=SEED             # 控制随机性以便结果可复现
+    # ),
 
     # "AdaBoost": AdaBoostClassifier(
     #     base_estimator=DecisionTreeClassifier(max_depth=7),   # 弱学习器

@@ -86,7 +86,7 @@ def parse_log(file_path):
 
 def compare_params(old_params, new_params):
     changes = {}
-    all_models = set(old_params.keys()).union(new_params.keys())
+    all_models = set(old_params.keys()).intersection(new_params.keys())
     for model in all_models:
         old = old_params.get(model, {})
         new = new_params.get(model, {})
@@ -137,7 +137,7 @@ def main(old_log, new_log):
     print("\n% 指标变化：")
     table = f"{'Model':<20} | {'Accuracy':>27} | {'Macro F1':>27} | {'Micro F1':>27} | {'Time Cost':>27}\n"
     table += "-" * 140 + '\n'
-    for model in param_changes.keys():
+    for model in set(new_metrics.keys()).intersection(old_metrics.keys()):
         old_metrics_row = old_metrics.get(model, {})
         new_metrics_row = new_metrics.get(model, {})
 
@@ -157,7 +157,7 @@ def main(old_log, new_log):
         accuracy_str = f"{accuracy_old:.5f} -> {accuracy_new:.5f} (" + (Color.green(f"{accuracy_delta:+.2f}%") if accuracy_delta > 0 else Color.red(f"{accuracy_delta:+.2f}%")) + ")"
         macro_f1_str = f"{macro_f1_old:.5f} -> {macro_f1_new:.5f} (" + (Color.green(f"{macro_f1_delta:+.2f}%") if macro_f1_delta > 0 else Color.red(f"{macro_f1_delta:+.2f}%")) + ")"
         micro_f1_str = f"{micro_f1_old:.5f} -> {micro_f1_new:.5f} (" + (Color.green(f"{micro_f1_delta:+.2f}%") if micro_f1_delta > 0 else Color.red(f"{micro_f1_delta:+.2f}%")) + ")"
-        time_str = f"{time_old:.5f} s -> {time_new:.5f} s (" + (Color.green(f"{time_delta * 100:+.2f}%") if time_delta > 0 else Color.red(f"{time_delta * 100:+.2f}%")) + ")"
+        time_str = f"{time_old:.5f} s -> {time_new:.5f} s (" + (Color.red(f"{time_delta * 100:+.2f}%") if time_delta >= 0 else Color.green(f"{time_delta * 100:+.2f}%")) + ")"
 
         table += f"{model:<20} | {accuracy_str:>20} | {macro_f1_str:>20} | {micro_f1_str:>20} | {time_str:>20}" + '\n'
 
