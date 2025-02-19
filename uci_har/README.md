@@ -75,10 +75,10 @@ python log.py ./log/result1.log ./log/result2.log
 - MLP 
 - Conv2d with single channel 
 - Conv1d with multiple channels 
+- Basic RNN 
 
 TODO的部分: 
 
-- Basic RNN 
 - Basic LSTM 
 - Basic GRU 
 - ConvLSTM 
