@@ -1,5 +1,5 @@
+import torch.nn as nn
 import torch as tc
-from torch import nn
 
 '''
 mlp
@@ -29,15 +29,22 @@ cnns
 '''
 
 
-class Conv1d_3x3(nn.Module):
+class Conv2d_3x3_huge(nn.Module):
     def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
-        super(Conv1d_3x3, self).__init__()
+        super(Conv2d_3x3_huge, self).__init__()
 
         layers = []
         layers_config = [
             {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
             {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 128, "use_bn": False, "padding": 1}
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 128, "use_bn": True, "padding": 1},
+            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 128, "use_bn": True, "padding": 1}
         ]
 
         wd, he = input_width, input_height
@@ -77,14 +84,101 @@ class Conv1d_3x3(nn.Module):
         return self.model(x)
 
 
-class Conv2d_3x3(nn.Module):
+class Conv2d_3x3_1(nn.Module):
+    def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
+        super(Conv2d_3x3_1, self).__init__()
+
+        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
+        self.pool1 = nn.MaxPool2d(2)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.dropout1 = nn.Dropout(dropout)
+
+        self.fc1 = nn.Linear(32 * (input_width // 2) * (input_height // 2), 128)
+        self.fc2 = nn.Linear(128, output_dim)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = nn.ReLU()(x)
+        x = self.pool1(x)
+        x = self.bn1(x)
+        x = self.dropout1(x)
+
+        x = x.view(x.size(0), -1)  # Flatten
+        x = self.fc1(x)
+        x = nn.ReLU()(x)
+        x = self.fc2(x)
+
+        return x
+
+
+class Conv2d_3x3_3(nn.Module):
+    def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
+        super(Conv2d_3x3_3, self).__init__()
+
+        # 第一层卷积：input_channels -> 32
+        self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
+        self.pool1 = nn.MaxPool2d(2)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.dropout1 = nn.Dropout(dropout)
+
+        # 第二层卷积：32 -> 64
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.pool2 = nn.MaxPool2d(2)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.dropout2 = nn.Dropout(dropout)
+
+        # 第三层卷积：64 -> 128
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.pool3 = nn.MaxPool2d(2)
+        self.bn3 = nn.BatchNorm2d(128)
+        self.dropout3 = nn.Dropout(dropout)
+
+        # 全连接层
+        self.fc1 = nn.Linear(128 * (input_width // 8) * (input_height // 8), 128)
+        self.fc2 = nn.Linear(128, output_dim)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = nn.ReLU()(x)
+        x = self.pool1(x)
+        x = self.bn1(x)
+        x = self.dropout1(x)
+
+        x = self.conv2(x)
+        x = nn.ReLU()(x)
+        x = self.pool2(x)
+        x = self.bn2(x)
+        x = self.dropout2(x)
+
+        x = self.conv3(x)
+        x = nn.ReLU()(x)
+        x = self.pool3(x)
+        x = self.bn3(x)
+        x = self.dropout3(x)
+
+        x = x.view(x.size(0), -1)  # Flatten
+        x = self.fc1(x)
+        x = nn.ReLU()(x)
+        x = self.fc2(x)
+
+        return x
+
+
+class Conv1d_3x_huge(nn.Module):
     def __init__(self, input_width, output_dim, input_channels, dropout=0.5):
-        super(Conv2d_3x3, self).__init__()
+        super(Conv1d_3x_huge, self).__init__()
 
         layers_config = [
             {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
             {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 128, "use_bn": False, "padding": 1}
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 128, "use_bn": True, "padding": 1},
+            {"kernel_size": (3,), "pool_size": (2,), "filters": 128, "use_bn": True, "padding": 1}
         ]
 
         layers = []
@@ -120,6 +214,75 @@ class Conv2d_3x3(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
+
+class Conv1d_3x_1(nn.Module):
+    def __init__(self, input_width, input_channels, output_dim, dropout=0.5):
+        super(Conv1d_3x_1, self).__init__()
+
+        self.conv = nn.Conv1d(input_channels, 32, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool1d(2)
+        self.dropout = nn.Dropout(dropout)
+        self.fc1 = nn.Linear(32 * (input_width // 2), 128)
+        self.fc2 = nn.Linear(128, output_dim)
+
+    def forward(self, x):
+        x = self.conv(x)
+        x = nn.ReLU()(x)
+        x = self.pool(x)
+        x = self.dropout(x)
+        x = x.view(x.size(0), -1)  # Flatten the tensor
+        x = self.fc1(x)
+        x = nn.ReLU()(x)
+        x = self.fc2(x)
+        return x
+
+
+class Conv1d_3x_3(nn.Module):
+    def __init__(self, input_width, input_channels, output_dim, dropout=0.5):
+        super(Conv1d_3x_3, self).__init__()
+
+        # 第一层卷积：input_channels -> 32
+        self.conv1 = nn.Conv1d(input_channels, 32, kernel_size=3, padding=1)
+        self.pool1 = nn.MaxPool1d(2)
+        self.dropout1 = nn.Dropout(dropout)
+
+        # 第二层卷积：32 -> 64
+        self.conv2 = nn.Conv1d(32, 64, kernel_size=3, padding=1)
+        self.pool2 = nn.MaxPool1d(2)
+        self.dropout2 = nn.Dropout(dropout)
+
+        # 第三层卷积：64 -> 128
+        self.conv3 = nn.Conv1d(64, 128, kernel_size=3, padding=1)
+        self.pool3 = nn.MaxPool1d(2)
+        self.dropout3 = nn.Dropout(dropout)
+
+        self.fc1 = nn.Linear(128 * (input_width // 8), 128)
+        self.fc2 = nn.Linear(128, output_dim)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = nn.ReLU()(x)
+        x = self.pool1(x)
+        x = self.dropout1(x)
+
+        x = self.conv2(x)
+        x = nn.ReLU()(x)
+        x = self.pool2(x)
+        x = self.dropout2(x)
+
+        x = self.conv3(x)
+        x = nn.ReLU()(x)
+        x = self.pool3(x)
+        x = self.dropout3(x)
+
+        x = x.view(x.size(0), -1)
+
+        x = self.fc1(x)
+        x = nn.ReLU()(x)
+        x = self.fc2(x)
+
+        return x
 
 
 '''

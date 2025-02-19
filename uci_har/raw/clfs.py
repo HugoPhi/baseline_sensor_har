@@ -45,7 +45,8 @@ class Clfs(ABC):
 
 
 class NNClfs(Clfs):
-    def __init__(self, X, y, config, model, pre_trained="./model.m5"):
+    def __init__(self, X, y, config, model, train_log=False, pre_trained="./model.m5"):
+        self.train_log = train_log
         self.config = config
         self.lr = config["lr"]
         self.epochs = config["epochs"]
@@ -78,6 +79,8 @@ class NNClfs(Clfs):
             dataloader = torch.utils.data.DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
             start_time = time.time()
+            if self.train_log:
+                print()
             for epoch in range(self.epochs):
                 for i, (x, y) in enumerate(dataloader):
                     self.optimizer.zero_grad()
@@ -86,7 +89,8 @@ class NNClfs(Clfs):
                     loss.backward()
                     self.optimizer.step()
 
-                print(f'Epoch {epoch+1}/{self.epochs}, Loss: {loss.item()}')
+                if self.train_log:
+                    print(f'Epoch {epoch+1}/{self.epochs}, Loss: {loss.item()}, Train Acc: {100 * (self.predict(self.X) == torch.argmax(self.y, dim=1)).float().mean().item():.2f}%')
             self.training_time = time.time() - start_time
         else:
             print("Loading pre-trained model...")
