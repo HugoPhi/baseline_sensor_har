@@ -1,0 +1,24 @@
+["mlp 4hr"]
+dropout = 0.2
+lr = 0.001
+epochs = 10
+batch_size = 32
+
+["conv2d_3x3 3hr"]
+dropout = 0.5
+lr = 0.001
+epochs = 10
+batch_size = 32
+
+["conv1d_3 3hr"]
+dropout = 0.5
+lr = 0.001
+epochs = 10
+batch_size = 32
+
+["rnn 1hr"]
+hidden_dims = 64
+dropout = 0
+lr = 0.001
+epochs = 10
+batch_size = 32

@@ -1,46 +1,17 @@
 import os
-import pandas as pd
-import numpy as np
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import classification_report
 from sklearn.metrics import f1_score
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from lightgbm import LGBMClassifier
 from xgboost import XGBClassifier
 from sklearn.svm import SVC
 
 from clfs import MLClfs, MLPClf, XGBClfs
+from data_process import X_train, y_train, X_test, y_test
 
 LOG_IX = 3
 SEED = 42
-X_train = pd.read_csv(
-    "../data/train/X_train.txt",
-    sep=r'\s+',
-    header=None,
-    engine='python').to_numpy()
-
-y_train = pd.read_csv(
-    "../data/train/y_train.txt",
-    sep=r'\s+',
-    header=None,
-    engine='python').to_numpy()
-
-X_test = pd.read_csv(
-    "../data/test/X_test.txt",
-    sep=r'\s+',
-    header=None,
-    engine='python').to_numpy()
-
-y_test = pd.read_csv(
-    "../data/test/y_test.txt",
-    sep=r'\s+',
-    header=None,
-    engine='python').to_numpy()
-
-shuffle = np.random.permutation(len(X_train))
-print(f"train: {len(X_train)}, test: {len(X_test)}")
-X_train, y_train = X_train[shuffle], y_train[shuffle]
-
 
 MODELS2 = {
     "DecisionTree": DecisionTreeClassifier(
@@ -61,23 +32,23 @@ MODELS2 = {
         random_state=SEED     # 控制随机性以便结果可复现
     ),
 
-    # "XGBoost": XGBClassifier(
-    #     n_estimators=200,             # 树的数量
-    #     max_depth=5,                  # 树的最大深度
-    #     learning_rate=0.1,            # 学习率
-    #     subsample=1,                  # 训练每棵树时使用的样本比例
-    #     colsample_bytree=1,           # 建树的特征比例
-    #     objective='binary:logistic',  # 损失函数
-    #     eval_metric='logloss',        # 评价指标
-    #     random_state=SEED             # 控制随机性以便结果可复现
-    # ),
+    "XGBoost": XGBClassifier(
+        n_estimators=200,             # 树的数量
+        max_depth=5,                  # 树的最大深度
+        learning_rate=0.1,            # 学习率
+        subsample=1,                  # 训练每棵树时使用的样本比例
+        colsample_bytree=1,           # 建树的特征比例
+        objective='binary:logistic',  # 损失函数
+        eval_metric='logloss',        # 评价指标
+        random_state=SEED             # 控制随机性以便结果可复现
+    ),
 
-    # "AdaBoost": AdaBoostClassifier(
-    #     base_estimator=DecisionTreeClassifier(max_depth=7),   # 弱学习器
-    #     n_estimators=100,    # 弱学习器的数量
-    #     learning_rate=1.,   # 对每个弱学习器的贡献程度
-    #     random_state=SEED   # 控制随机性以便结果可复现
-    # ),
+    "AdaBoost": AdaBoostClassifier(
+        base_estimator=DecisionTreeClassifier(max_depth=7),   # 弱学习器
+        n_estimators=100,    # 弱学习器的数量
+        learning_rate=1.,   # 对每个弱学习器的贡献程度
+        random_state=SEED   # 控制随机性以便结果可复现
+    ),
 
     "SVM": SVC(
         C=0.4,              # 正则化参数

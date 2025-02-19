@@ -1,6 +1,5 @@
 import pandas as pd
 import seaborn as sns
-import numpy as np
 import matplotlib.pyplot as plt
 
 
@@ -77,25 +76,56 @@ class DataAnalysis:
         print('============================================================')
 
 
-PATH = '../data/train/Inertial Signals/'
-PREFIXS = [
-    'body_acc_x_',
-    'body_acc_y_',
-    'body_acc_z_',
-    'body_gyro_x_',
-    'body_gyro_y_',
-    'body_gyro_z_',
-    'total_acc_x_',
-    'total_acc_y_',
-    'total_acc_z_',
-]
+# 加载训练集
+X_train = pd.read_csv(
+    "../data/train/X_train.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python')
 
+with open('../data/features.txt', 'r') as file:
+    headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
 
-X_train = []
-for prefix in PREFIXS:
-    X_train.append(pd.read_csv(PATH + prefix + 'train.txt', header=None, delim_whitespace=True).to_numpy())
-X_train = np.transpose(np.array(X_train), (1, 0, 2))
+X_train.columns = headers
 
-y_train = pd.read_csv('../data/train/y_train.txt', header=None).to_numpy()
-print(X_train.shape)
-print(y_train.shape)
+RANGE = [headers[x] for x in range(6)]
+
+DataAnalysis(X_train[RANGE])
+
+Y_train = pd.read_csv(
+    "../data/train/y_train.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python'
+)
+
+DataAnalysis(Y_train)
+
+# 加载测试集
+X_test = pd.read_csv(
+    "../data/test/X_test.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python')
+
+with open('../data/features.txt', 'r') as file:
+    headers = [line.split(' ', 1)[1].strip() for line in file.readlines()]
+
+X_test.columns = headers
+
+RANGE = [headers[x] for x in range(6)]
+
+DataAnalysis(X_test[RANGE])
+
+Y_test = pd.read_csv(
+    "../data/test/y_test.txt",
+    sep=r'\s+',
+    header=None,
+    engine='python'
+)
+
+DataAnalysis(Y_test)
+# np.set_printoptions(suppress=True, precision=5)
+# val, train = np.unique(Y_train.to_numpy(), return_counts=True)
+# _, test = np.unique(Y_test.to_numpy(), return_counts=True)
+# print(np.stack((val, train, test, train / test)))
