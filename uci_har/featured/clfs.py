@@ -1,34 +1,48 @@
+import time
 import torch as tc
 import joblib
-from abc import ABC, abstractmethod
-import time
 import numpy as np
+from abc import ABC, abstractmethod
 
 
 class Clfs(ABC):
-    # 1. 快速取用
-    # 2. 参数信息获取
-    # 3. 同一API
+    '''
+    Classifier 接口：
+      - fit(self, X_train, y_train, load=Flase): 训练分类器
+      - predict(self, x_test): 返回x_test的预测值
+      - predict_proba(self, x_test): 返回x_test的预测概率矩阵
+      - hyper_info(self): 返回超参数字典
+      - get_training_time(self): 获取训练时间，如果load=False
+      - get_testing_time(self): 获取测试时间
 
+    * 这样的接口设计可以使得学习器的训练和学习过程有一个同一的API，便于不同框架下模型的对比
+    * 新版的这套接口让"预测器"和将要使用的数据集分割开；让预测器和模型的具体架构分割开
+    '''
     @abstractmethod
-    def __init__(self):
-        self.model = None
-        self.x = None
-        self.y = None
+    def __init__(self, model):
+        self.model = model
         self.training_time = -1
         self.testing_time = -1
 
     @abstractmethod
-    def predict(self):
+    def predict(self, x_test) -> np.ndarray:
         '''
-        !!! 在这里要统计预测时间
+        - 这里返回和y_train同样形式的结果向量
+        - 在这里要统计预测时间
         '''
         pass
 
     @abstractmethod
-    def fit(self, load=False):
+    def predict_proba(self, x_test) -> np.ndarray:
         '''
-        !!! 在这里要统计测试时间
+        - 这里返回经过softmax之后的概率矩阵
+        '''
+        pass
+
+    @abstractmethod
+    def fit(self, X_train, y_train, load=False):
+        '''
+        - 在这里要统计测试时间
         '''
         pass
 
@@ -36,61 +50,79 @@ class Clfs(ABC):
     def hyper_info(self) -> dict:
         pass
 
+    @abstractmethod
+    def get_training_time(self):
+        pass
+
+    @abstractmethod
+    def get_testing_time(self):
+        pass
+
 
 class MLClfs(Clfs):
-    def __init__(self, model, x, y, param_file=None):
+    def __init__(self, model, param_file=None):
         '''
         x: 训练集
         y: 测试集
         '''
 
         self.model = model
-        self.x = x
-        self.y = y
         self.param_file = 'model_filename.pkl'
         self.training_time = -1
         self.testing_time = -1
 
-    def fit(self, load=False):
+    def fit(self, X_train, y_train, load=False):
         if load:
             self.model = joblib.load('model_filename.pkl')
 
         start = time.time()
-        self.model.fit(self.x, self.y.ravel())
+        self.model.fit(X_train, y_train.ravel())
         end = time.time()
         self.training_time = end - start
 
     def predict(self, x_test):
         start = time.time()
+        # y_pred = self.model.predict(x_test)
         y_pred = self.model.predict(x_test)
         end = time.time()
         self.testing_time = end - start
         return y_pred.squeeze()
 
+    def predict_proba(self, x_test):
+        start = time.time()
+        y_pred = self.model.predict_proba(x_test)
+        end = time.time()
+        self.testing_time = end - start
+        return y_pred
+
     def hyper_info(self):
         return self.model.get_params()
 
+    def get_training_time(self):
+        return self.training_time
+
+    def get_testing_time(self):
+        return self.testing_time
+
 
 class XGBClfs(Clfs):
-    def __init__(self, model, x, y, param_file=None):
+    def __init__(self, model, param_file=None):
         '''
         x: 训练集
         y: 测试集
         '''
 
         self.model = model
-        self.x = x
-        self.y = y
         self.param_file = 'model_filename.pkl'
         self.training_time = -1
         self.testing_time = -1
 
-    def fit(self, load=False):
+    def fit(self, X_train, y_train, load=False):
         if load:
             self.model = joblib.load('model_filename.pkl')
 
         start = time.time()
-        self.model.fit(self.x, self.y.ravel() - 1)
+        self.model.fit(X_train.x, y_train.ravel() - 1)
         end = time.time()
         self.training_time = end - start
 
@@ -101,51 +133,41 @@ class XGBClfs(Clfs):
         self.testing_time = end - start
         return y_pred.squeeze() + 1
 
+    def predict_proba(self, x_test):
+        start = time.time()
+        y_pred = self.model.predict_proba(x_test)
+        end = time.time()
+        self.testing_time = end - start
+        return y_pred
+
     def hyper_info(self):
         return self.model.get_params()
 
+    def get_training_time(self):
+        return self.training_time
+
+    def get_testing_time(self):
+        return self.testing_time
+
 
 class MLPClf(Clfs):
-    def __init__(self, X, y):
-        # 将标签重新映射为从 0 开始的连续整数
-        y = y - 1
-
-        # 获取数据集参数
-        input_size = X.shape[1]
-        num_classes = len(np.unique(y))  # 类别数
-
-        # 定义MLP模型
-
-        class MLP(tc.nn.Module):
-            def __init__(self, input_size, output_size):
-                super(MLP, self).__init__()
-                self.fc1 = tc.nn.Linear(input_size, 128)
-                self.fc2 = tc.nn.Linear(128, 64)
-                self.fc3 = tc.nn.Linear(64, 32)
-                self.fc4 = tc.nn.Linear(32, output_size)
-
-            def forward(self, x):
-                x = tc.relu(self.fc1(x))
-                x = tc.relu(self.fc2(x))
-                x = tc.relu(self.fc3(x))
-                x = self.fc4(x)  # CrossEntropyLoss会自动处理logits
-                return x
-
-        # 初始化模型
-        self.model = MLP(input_size, num_classes)
+    def __init__(self, epochs, lr, model):
+        self.epochs = epochs
+        self.lr = lr
+        self.model = model
 
         # 定义损失函数和优化器
         self.criterion = tc.nn.CrossEntropyLoss()
-        self.optimizer = tc.optim.Adam(self.model.parameters(), lr=0.001)
+        self.optimizer = tc.optim.Adam(self.model.parameters(), lr=self.lr)
 
         # 转换为Tensor并统一数据类型
-        self.X_train_tensor = tc.tensor(X, dtype=tc.float32)
-        self.y_train_tensor = tc.tensor(y, dtype=tc.long).reshape(-1)
 
-    def fit(self, load=False):
+    def fit(self, X_train, y_train, load=False):
         # 训练循环
+        self.X_train_tensor = tc.tensor(X_train, dtype=tc.float32)
+        self.y_train_tensor = tc.tensor(y_train - 1, dtype=tc.long).reshape(-1)
         start = time.time()
-        for epoch in range(500):
+        for epoch in range(self.epochs):
             self.optimizer.zero_grad()
             outputs = self.model(self.X_train_tensor)
             loss = self.criterion(outputs, self.y_train_tensor)
@@ -157,6 +179,18 @@ class MLPClf(Clfs):
         end = time.time()
         self.training_time = end - start
 
+    def predict_proba(self, x_test):
+        # 测试阶段
+        start = time.time()
+        self.model.eval()
+        with tc.no_grad():
+            X_test_tensor = tc.tensor(x_test, dtype=tc.float32)
+            test_outputs = self.model(X_test_tensor)
+            test_outputs = tc.nn.functional.softmax(test_outputs)
+        end = time.time()
+        self.testing_time = end - start
+        return test_outputs.numpy()
+
     def predict(self, x_test):
         # 测试阶段
         start = time.time()
@@ -165,17 +199,21 @@ class MLPClf(Clfs):
             X_test_tensor = tc.tensor(x_test, dtype=tc.float32)
             test_outputs = self.model(X_test_tensor)
             y_pred = test_outputs.argmax(dim=1).numpy()
-
         end = time.time()
         self.testing_time = end - start
-
-        return y_pred.squeeze() + 1
+        return y_pred.squeeze() + 1  # class from [1, 2, 3, 4, 5, 6]
 
     def hyper_info(self):
         return {
             "hidden_size": "561 -> 128 -> 64 -> 32 -> 6",
-            "lr": 0.001,
+            "lr": self.lr,
             "optimizer": "Adam",
             "loss": "CrossEntropyLoss",
-            "epochs": 500
+            "epochs": self.epochs
         }
+
+    def get_training_time(self):
+        return self.training_time
+
+    def get_testing_time(self):
+        return self.testing_time

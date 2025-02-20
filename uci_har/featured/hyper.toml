@@ -1,0 +1,53 @@
+[DecisionTree]
+criterion = "gini"             # 分裂质量的评价标准
+# max_depth = null                # 树的最大深度
+min_samples_split = 2           # 内部节点再划分所需最小样本数
+min_samples_leaf = 3            # 叶节点所需的最小样本数
+random_state = 239             # 控制随机性以便结果可复现
+
+[RandomForest]
+n_estimators = 20             # 树的数量
+criterion = "gini"             # 分裂质量的评价标准
+# max_depth = null                # 树的最大深度
+min_samples_split = 4           # 内部节点再划分所需最小样本数
+min_samples_leaf = 1            # 叶节点所需的最小样本数
+bootstrap = true                # 是否进行bootstrap采样
+random_state = 239             # 控制随机性以便结果可复现
+
+[XGBoost]
+n_estimators = 20             # 树的数量
+max_depth = 5                   # 树的最大深度
+learning_rate = 0.1             # 学习率
+subsample = 1                   # 训练每棵树时使用的样本比例
+colsample_bytree = 1            # 建树的特征比例
+objective = "binary:logistic"   # 损失函数
+eval_metric = "logloss"         # 评价指标
+random_state = 239             # 控制随机性以便结果可复现
+
+[AdaBoost]
+n_estimators = 10             # 弱学习器的数量
+learning_rate = 1.0            # 对每个弱学习器的贡献程度
+random_state = 239            # 控制随机性以便结果可复现
+
+[SVM]
+C = 0.4                        # 正则化参数
+kernel = "rbf"                 # 核函数类型
+degree = 3                     # 多项式核函数的次数（'poly'时有效）
+gamma = "scale"                # 核系数（对于'rbd', 'poly', 'sigmoid'有效）
+probability = true            # 是否启用概率估计
+random_state = 239            # 控制随机性以便结果可复现（仅对某些选项有效）
+
+[LightGBM]
+n_estimators = 20             # 树的数量
+max_depth = -1                  # 树的最大深度（-1表示没有限制）
+learning_rate = 0.1            # 学习率
+num_leaves = 30                # 一棵树上的叶子数
+subsample = 1.0                 # 训练每棵树时使用的样本比例
+colsample_bytree = 1.0         # 建树的特征比例
+objective = "multiclass"       # 目标函数
+metric = "multi_logloss"       # 评价指标
+random_state = 239            # 控制随机性以便结果可复现
+
+[mlp]
+epochs = 20
+lr = 0.001
