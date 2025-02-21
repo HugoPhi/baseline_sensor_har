@@ -4,9 +4,9 @@
 Figure 1: Overview of deeplearning for HAR [1]
 </p>
 
-# ✨ Examples for HAR
+# ✨ Examples for HAR for Sensors
 
-本项目将会以数据集为对象，对HAR的各种Baseline算法进行实现。目前主流的方法有两大类：
+本项目将会以数据集为对象，对基于传感器的HAR的各种Baseline算法进行实现。目前主流的方法有两大类：
 
 - 特征工程+机器学习算法
 - 深度学习算法
