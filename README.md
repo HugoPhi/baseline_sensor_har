@@ -4,7 +4,7 @@
 Figure 1: Overview of deeplearning for HAR [1]
 </p>
 
-# Examples for HAR
+# ✨ Examples for HAR
 
 本项目将会以数据集为对象，对HAR的各种Baseline算法进行实现。目前主流的方法有两大类：
 
@@ -13,11 +13,11 @@ Figure 1: Overview of deeplearning for HAR [1]
 
 项目中都会进行实现。 
 
-## TODO List
+## 🚧 TODO List
 
 这是目前的进度： 
 
-- (DOING) UCI HAR
+- 🚧(DOING) UCI HAR [\[link\]](https://www.kaggle.com/datasets/drsaeedmohsen/ucihar-dataset)
 - WISDOM [\[link\]](https://archive.ics.uci.edu/ml/datasets/WISDM+Smartphone+and+Smartwatch+Activity+and+Biometrics+Dataset+)
 - PAMAP2 [\[link\]](http://archive.ics.uci.edu/ml/datasets/pamap2+physical+activity+monitoring)
 - OPPORTUNITY [\[link\]](https://archive.ics.uci.edu/ml/datasets/opportunity+activity+recognition)

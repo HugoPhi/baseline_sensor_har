@@ -61,7 +61,7 @@ python log.py ./log/result1.log ./log/result2.log
 - DecisionTree 
 - RandomForest 
 - XGBoost 
-- AdaBoost 
+- AdaBoost, based on DecisionTree(max_depth = 7)
 - LightGBM 
 - SVM 
 - MLP  
@@ -84,9 +84,9 @@ python log.py ./log/result1.log ./log/result2.log
 TODO的部分: 
 
 - ConvLSTM 
-- ResBiLSTM [[Zhao et al. (2017)](https://arxiv.org/abs/1708.08989)]
+- ResBiLSTM, **Zhao et al. (2017)**, [1]
 
 
 # Reference 
 
-- Zhao, Y., Yang, R., Chevalier, G., & Gong, M. (2017). Deep Residual Bidir-LSTM for Human Activity Recognition Using Wearable Sensors. arXiv preprint [arXiv:1708.08989](https://arxiv.org/abs/1708.08989). 
+[1] Zhao, Y., Yang, R., Chevalier, G., & Gong, M. (2017). Deep Residual Bidir-LSTM for Human Activity Recognition Using Wearable Sensors. arXiv preprint [arXiv:1708.08989](https://arxiv.org/abs/1708.08989). 
