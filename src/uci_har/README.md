@@ -76,14 +76,14 @@ python log.py ./log/result1.log ./log/result2.log
 - Conv2d with single channel 
 - Conv1d with multiple channels 
 - Basic RNN 
+- Basic LSTM 
+- Basic GRU 
+- BiLSTM 
+- BiGRU 
 
 TODO的部分: 
 
-- Basic LSTM 
-- Basic GRU 
 - ConvLSTM 
-- BiLSTM 
-- BiGRU 
 - ResBiLSTM [[Zhao et al. (2017)](https://arxiv.org/abs/1708.08989)]
 
 

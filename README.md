@@ -1,6 +1,8 @@
 ![paper](./assets/paper.png)
 
-<center> Figure 1: Overview of deeplearning for HAR </center>
+<p align='center'>
+Figure 1: Overview of deeplearning for HAR [1]
+</p>
 
 # Examples for HAR
 
@@ -22,3 +24,8 @@
 - UNIMIB-SHAR [\[link\]](http://www.sal.disco.unimib.it/technologies/unimib-shar/)
 - USC-HAD [\[link\]](https://sipi.usc.edu/had/)
 - mHealth
+
+
+# Reference
+
+[1] Gu, F., Chung, M.-H., Chignell, M., Valaee, S., Zhou, B., & Liu, X. (2022). A Survey on Deep Learning for Human Activity Recognition. ACM Computing Surveys, 54(8), 1–34. https://doi.org/10.1145/3472290
