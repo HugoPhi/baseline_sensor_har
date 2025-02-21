@@ -10,6 +10,8 @@ class MLP(nn.Module):
     def __init__(self, input_dim, hidden_dims, output_dim, dropout=0.5):
         super(MLP, self).__init__()
 
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         layers = []
         prev_dim = input_dim
         for hdim in hidden_dims:
@@ -127,6 +129,8 @@ class Conv2d_3x3_huge(nn.Module):
     def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
         super(Conv2d_3x3_huge, self).__init__()
 
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         layers = []
         layers_config = [
             {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 32, 'use_bn': True, 'padding': 1},
@@ -180,6 +184,8 @@ class Conv2d_3x3_1(nn.Module):
     def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
         super(Conv2d_3x3_1, self).__init__()
 
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
         self.pool1 = nn.MaxPool2d(2)
 
@@ -204,6 +210,8 @@ class Conv2d_3x3_1(nn.Module):
 class Conv2d_3x3_3(nn.Module):
     def __init__(self, input_width, input_height, input_channels, output_dim, dropout=0.5):
         super(Conv2d_3x3_3, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
 
         # 第一层卷积：input_channels -> 32
         self.conv1 = nn.Conv2d(input_channels, 32, kernel_size=3, padding=1)
@@ -253,6 +261,8 @@ class Conv2d_3x3_3(nn.Module):
 class Conv1d_3x_huge(nn.Module):
     def __init__(self, input_width, output_dim, input_channels, dropout=0.5):
         super(Conv1d_3x_huge, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
 
         layers_config = [
             {'kernel_size': (3,), 'pool_size': (2,), 'filters': 32, 'use_bn': True, 'padding': 1},
@@ -304,6 +314,8 @@ class Conv1d_3x_1(nn.Module):
     def __init__(self, input_width, input_channels, output_dim, dropout=0.5):
         super(Conv1d_3x_1, self).__init__()
 
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         self.conv = nn.Conv1d(input_channels, 32, kernel_size=3, padding=1)
         self.pool = nn.MaxPool1d(2)
 
@@ -327,6 +339,8 @@ class Conv1d_3x_1(nn.Module):
 class Conv1d_3x_3(nn.Module):
     def __init__(self, input_width, input_channels, output_dim, dropout=0.5):
         super(Conv1d_3x_3, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
 
         # 第一层卷积：input_channels -> 32
         self.conv1 = nn.Conv1d(input_channels, 32, kernel_size=3, padding=1)
@@ -374,13 +388,15 @@ class Conv1d_3x_3(nn.Module):
 
 '''
 rnns
------------------------------
 '''
 
 
 class BasicRNN(nn.Module):  # too shit, discard
     def __init__(self, input_dim, hidden_dim, output_dim, dropout=0.5):
         super(BasicRNN, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         self.rnn = nn.RNN(input_size=input_dim,
                           hidden_size=hidden_dim,
                           num_layers=1,
@@ -398,20 +414,100 @@ class BasicRNN(nn.Module):  # too shit, discard
 
 
 class BasicLSTM(nn.Module):
-    def __init__(self, input_dim, hidden_dim, output_dim, dropout=0.5):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout=0.5):
         super(BasicLSTM, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
         self.lstm = nn.LSTM(input_size=input_dim,
                             hidden_size=hidden_dim,
-                            num_layers=1,
+                            num_layers=num_layers,
                             batch_first=True,
                             dropout=dropout)
         self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
         self.fc = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        h0 = tc.zeros(1, x.size(0), self.hidden_dim).to(x.device)  # 初始化隐藏状态
-        c0 = tc.zeros(1, x.size(0), self.hidden_dim).to(x.device)  # 初始化单元状态
+        h0 = tc.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 初始化隐藏状态
+        c0 = tc.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 初始化单元状态
         out, _ = self.lstm(x.float(), (h0, c0))
+        out = out[:, -1, :]  # 只取序列的最后一个时间步的输出
+        outputs = self.fc(out)
+        return outputs
+
+
+class BasicGRU(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout=0.5):
+        super(BasicGRU, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
+
+        self.gru = nn.GRU(
+            input_size=input_dim,
+            hidden_size=hidden_dim,
+            num_layers=num_layers,
+            batch_first=True,
+            dropout=dropout,
+        )
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
+        self.fc = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, x):
+        h0 = tc.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 初始化隐藏状态
+        out, _ = self.gru(x.float(), h0)
+        out = out[:, -1, :]  # 只取序列的最后一个时间步的输出
+        outputs = self.fc(out)
+        return outputs
+
+
+class BiLSTM(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout=0.5):
+        super(BiLSTM, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}
+
+        # 双向LSTM
+        self.lstm = nn.LSTM(input_size=input_dim,
+                            hidden_size=hidden_dim,
+                            num_layers=num_layers,
+                            batch_first=True,
+                            dropout=dropout,
+                            bidirectional=True)  # 这里开启双向LSTM
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
+        self.fc = nn.Linear(2 * hidden_dim, output_dim)  # 双向LSTM输出维度是2 * hidden_dim
+
+    def forward(self, x):
+        h0 = tc.zeros(2 * self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 双向LSTM的h0需要两个方向
+        c0 = tc.zeros(2 * self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 双向LSTM的c0需要两个方向
+        out, _ = self.lstm(x.float(), (h0, c0))
+        out = out[:, -1, :]  # 只取序列的最后一个时间步的输出
+        outputs = self.fc(out)
+        return outputs
+
+
+class BiGRU(nn.Module):
+    def __init__(self, input_dim, hidden_dim, num_layers, output_dim, dropout=0.5):
+        super(BiGRU, self).__init__()
+
+        self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}
+
+        # 双向GRU
+        self.gru = nn.GRU(input_size=input_dim,
+                          hidden_size=hidden_dim,
+                          num_layers=num_layers,
+                          batch_first=True,
+                          dropout=dropout,
+                          bidirectional=True)  # 这里开启双向GRU
+        self.hidden_dim = hidden_dim
+        self.num_layers = num_layers
+        self.fc = nn.Linear(2 * hidden_dim, output_dim)  # 双向GRU输出维度是2 * hidden_dim
+
+    def forward(self, x):
+        h0 = tc.zeros(2 * self.num_layers, x.size(0), self.hidden_dim).to(x.device)  # 双向GRU的h0需要两个方向
+        out, _ = self.gru(x.float(), h0)
         out = out[:, -1, :]  # 只取序列的最后一个时间步的输出
         outputs = self.fc(out)
         return outputs

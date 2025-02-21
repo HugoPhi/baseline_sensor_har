@@ -1,0 +1,104 @@
+[mlp.hyper]
+lr = 0.001
+epochs = 50
+batch_size = 32
+train_log = true
+
+[mlp.model]
+dropout = 0.2
+hidden_dims = [256, 128, 64, 32]
+
+
+
+[conv2d_3x3_3.hyper]
+lr = 0.001
+epochs = 50
+batch_size = 32
+train_log = true
+
+[conv2d_3x3_3.model]
+dropout = 0.2
+
+
+
+[conv2d_3x3_1.hyper]
+lr = 0.001
+epochs = 50
+batch_size = 32
+train_log = true
+
+[conv2d_3x3_1.model]
+dropout = 0.2
+
+
+
+[conv1d_3_3.hyper]
+lr = 0.001
+epochs = 50
+batch_size = 32
+
+train_log = true
+[conv1d_3_3.model]
+dropout = 0.2
+
+
+
+[conv1d_3_1.hyper]
+lr = 0.001
+epochs = 50
+batch_size = 32
+train_log = true
+
+[conv1d_3_1.model]
+dropout = 0.2
+
+
+
+[lstm.hyper]
+lr = 0.001
+epochs = 100
+batch_size = 32
+train_log = true
+
+[lstm.model]
+hidden_dim = 64
+num_layers = 3
+dropout = 0.2
+
+
+[gru.hyper]
+lr = 0.001
+epochs = 20
+batch_size = 32
+train_log = true
+
+[gru.model]
+hidden_dim = 64
+num_layers = 3
+dropout = 0.2
+
+
+
+[bilstm.hyper]
+lr = 0.001
+epochs = 100
+batch_size = 32
+train_log = true
+
+[bilstm.model]
+hidden_dim = 64
+num_layers = 3
+dropout = 0.2
+
+
+
+[bigru.hyper]
+lr = 0.001
+epochs = 20
+batch_size = 32
+train_log = true
+
+[bigru.model]
+hidden_dim = 64
+num_layers = 3
+dropout = 0.2

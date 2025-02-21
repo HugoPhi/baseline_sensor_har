@@ -62,7 +62,7 @@ metric = "multi_logloss" # 评价指标
 random_state = 239       # 控制随机性以便结果可复现
 verbose = -1             # 不要打印日志
 
-[mlp.hyper]
+[MLP.hyper]
 epochs = 1000
 lr = 0.001
-[mlp.model]
+[MLP.model]
