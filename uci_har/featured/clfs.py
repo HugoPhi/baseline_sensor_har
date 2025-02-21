@@ -16,7 +16,7 @@ class Clfs(ABC):
       - get_testing_time(self): 获取测试时间
 
     * 这样的接口设计可以使得学习器的训练和学习过程有一个同一的API，便于不同框架下模型的对比
-    * 新版的这套接口让"预测器"和将要使用的数据集分割开；让预测器和模型的具体架构分割开
+    * 新版的这套接口让'预测器'和将要使用的数据集分割开；让预测器和模型的具体架构分割开
     '''
     @abstractmethod
     def __init__(self, model):
@@ -47,7 +47,11 @@ class Clfs(ABC):
         pass
 
     @abstractmethod
-    def hyper_info(self) -> dict:
+    def hyper_info(self):
+        '''
+        返回hyper和model两个字典，分别表示超参数和模型的__init__()所需要的参数。用于编写日志复刻模型。
+        return hyper: dict, model: dict
+        '''
         pass
 
     @abstractmethod
@@ -96,7 +100,9 @@ class MLClfs(Clfs):
         return y_pred
 
     def hyper_info(self):
-        return self.model.get_params()
+        hyper = dict()
+        model = self.model.get_params()
+        return hyper, model
 
     def get_training_time(self):
         return self.training_time
@@ -122,7 +128,7 @@ class XGBClfs(Clfs):
             self.model = joblib.load('model_filename.pkl')
 
         start = time.time()
-        self.model.fit(X_train.x, y_train.ravel() - 1)
+        self.model.fit(X_train, y_train.ravel() - 1)
         end = time.time()
         self.training_time = end - start
 
@@ -141,7 +147,9 @@ class XGBClfs(Clfs):
         return y_pred
 
     def hyper_info(self):
-        return self.model.get_params()
+        hyper = dict()
+        model = self.model.get_params()
+        return hyper, model
 
     def get_training_time(self):
         return self.training_time
@@ -152,6 +160,8 @@ class XGBClfs(Clfs):
 
 class MLPClf(Clfs):
     def __init__(self, epochs, lr, model):
+        self.params = {key: value for key, value in locals().items() if key != 'self' and key != 'model'}  # 这里保证可以复刻这个Clf
+
         self.epochs = epochs
         self.lr = lr
         self.model = model
@@ -160,22 +170,20 @@ class MLPClf(Clfs):
         self.criterion = tc.nn.CrossEntropyLoss()
         self.optimizer = tc.optim.Adam(self.model.parameters(), lr=self.lr)
 
-        # 转换为Tensor并统一数据类型
-
     def fit(self, X_train, y_train, load=False):
         # 训练循环
-        self.X_train_tensor = tc.tensor(X_train, dtype=tc.float32)
-        self.y_train_tensor = tc.tensor(y_train - 1, dtype=tc.long).reshape(-1)
+        X_train_tensor = tc.tensor(X_train, dtype=tc.float32)
+        y_train_tensor = tc.tensor(y_train - 1, dtype=tc.long).reshape(-1)
         start = time.time()
         for epoch in range(self.epochs):
             self.optimizer.zero_grad()
-            outputs = self.model(self.X_train_tensor)
-            loss = self.criterion(outputs, self.y_train_tensor)
+            outputs = self.model(X_train_tensor)
+            loss = self.criterion(outputs, y_train_tensor)
             loss.backward()
             self.optimizer.step()
 
             if epoch % 10 == 0:
-                print(f"Epoch: {epoch}, Loss: {loss.item()}")
+                print(f'Epoch: {epoch}, Loss: {loss.item()}')
         end = time.time()
         self.training_time = end - start
 
@@ -186,7 +194,7 @@ class MLPClf(Clfs):
         with tc.no_grad():
             X_test_tensor = tc.tensor(x_test, dtype=tc.float32)
             test_outputs = self.model(X_test_tensor)
-            test_outputs = tc.nn.functional.softmax(test_outputs)
+            test_outputs = tc.nn.functional.softmax(test_outputs, dim=1)
         end = time.time()
         self.testing_time = end - start
         return test_outputs.numpy()
@@ -204,13 +212,9 @@ class MLPClf(Clfs):
         return y_pred.squeeze() + 1  # class from [1, 2, 3, 4, 5, 6]
 
     def hyper_info(self):
-        return {
-            "hidden_size": "561 -> 128 -> 64 -> 32 -> 6",
-            "lr": self.lr,
-            "optimizer": "Adam",
-            "loss": "CrossEntropyLoss",
-            "epochs": self.epochs
-        }
+        hyper = self.params
+        model = dict()
+        return hyper, model
 
     def get_training_time(self):
         return self.training_time

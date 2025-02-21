@@ -16,7 +16,7 @@ class Clfs(ABC):
       - get_testing_time(self): 获取测试时间
 
     * 这样的接口设计可以使得学习器的训练和学习过程有一个同一的API，便于不同框架下模型的对比
-    * 新版的这套接口让"预测器"和将要使用的数据集分割开；让预测器和模型的具体架构分割开
+    * 新版的这套接口让'预测器'和将要使用的数据集分割开；让预测器和模型的具体架构分割开
     '''
     @abstractmethod
     def __init__(self, model):
@@ -76,17 +76,17 @@ class NNClfs(Clfs):
       - epochs: 训练轮数
       - model: 模型实例
       - train_log(bool=False): 是否显示训练过程
-      - pre_trained(str="./model.m5"): 训练好的模型的文件路径
+      - pre_trained(str='./model.m5'): 训练好的模型的文件路径
     '''
 
-    def __init__(self, lr, epochs, batch_size, dropout, model, train_log=False, pre_trained="./model.m5"):
+    def __init__(self, lr, epochs, batch_size, dropout, model, train_log=False, pre_trained='./model.m5'):
         self.train_log = train_log
         self.config = {
-            "lr": lr,
-            "epochs": epochs,
-            "batch_size": batch_size,
-            "dropout": dropout,
-            "model arch": model,
+            'lr': lr,
+            'epochs': epochs,
+            'batch_size': batch_size,
+            'dropout': dropout,
+            'model arch': model,
         }
         self.lr = lr
         self.epochs = epochs
@@ -129,7 +129,7 @@ class NNClfs(Clfs):
             self.training_time = time.time() - start_time
         else:
             self.model.load_state_dict(torch.load(self.pre_trained))
-            print("Pre-trained model loaded.")
+            print('Pre-trained model loaded.')
 
     def predict(self, X_test):
         start_time = time.time()
@@ -187,7 +187,7 @@ class RNNClf(NNClfs):
     def __init__(self, hidden_dims, *args, **dargs):
         super(RNNClf, self).__init__(*args, **dargs)
 
-        self.config["hidden_dims"] = hidden_dims
+        self.config['hidden_dims'] = hidden_dims
 
     def xpip(self, x):
         return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)

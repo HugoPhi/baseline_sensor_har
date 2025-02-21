@@ -129,26 +129,26 @@ class Conv2d_3x3_huge(nn.Module):
 
         layers = []
         layers_config = [
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 128, "use_bn": True, "padding": 1},
-            {"kernel_size": (3, 3), "pool_size": (2, 2), "filters": 128, "use_bn": True, "padding": 1}
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 128, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3, 3), 'pool_size': (2, 2), 'filters': 128, 'use_bn': True, 'padding': 1}
         ]
 
         wd, he = input_width, input_height
         prev_filters = input_channels
         for layer_config in layers_config:
-            kernel_size = layer_config["kernel_size"]
-            pool_size = layer_config["pool_size"]
-            filters = layer_config["filters"]
-            use_bn = layer_config["use_bn"]
-            padding = layer_config["padding"]
+            kernel_size = layer_config['kernel_size']
+            pool_size = layer_config['pool_size']
+            filters = layer_config['filters']
+            use_bn = layer_config['use_bn']
+            padding = layer_config['padding']
 
             layers.append(nn.Conv2d(prev_filters, filters, kernel_size=kernel_size, padding=padding))
             if use_bn:
@@ -255,27 +255,27 @@ class Conv1d_3x_huge(nn.Module):
         super(Conv1d_3x_huge, self).__init__()
 
         layers_config = [
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 32, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 64, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 128, "use_bn": True, "padding": 1},
-            {"kernel_size": (3,), "pool_size": (2,), "filters": 128, "use_bn": True, "padding": 1}
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 32, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 64, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 128, 'use_bn': True, 'padding': 1},
+            {'kernel_size': (3,), 'pool_size': (2,), 'filters': 128, 'use_bn': True, 'padding': 1}
         ]
 
         layers = []
         wd = input_width
         prev_filters = input_channels
         for layer_config in layers_config:
-            kernel_size = layer_config["kernel_size"]
-            pool_size = layer_config["pool_size"]
-            filters = layer_config["filters"]
-            use_bn = layer_config["use_bn"]
-            padding = layer_config.get("padding", 0)
+            kernel_size = layer_config['kernel_size']
+            pool_size = layer_config['pool_size']
+            filters = layer_config['filters']
+            use_bn = layer_config['use_bn']
+            padding = layer_config.get('padding', 0)
 
             layers.append(nn.Conv1d(prev_filters, filters, kernel_size=kernel_size, padding=padding))
             if use_bn:

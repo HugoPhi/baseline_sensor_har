@@ -24,7 +24,7 @@ class Metrics:
         self.y_pred = y_pred
         uni = np.unique(self.y)
         if uni[0] != 0:
-            raise ValueError("y must start from 0")
+            raise ValueError('y must start from 0')
 
         self.classes = uni.shape[0]  # get classes num
 
