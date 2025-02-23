@@ -2,96 +2,70 @@
 lr = 0.001
 epochs = 100
 batch_size = 128
-train_log = true
-
-# model
+hidden_dims = [ 256, 128, 64, 32,]
 dropout = 0.2
-hidden_dims = [256, 128, 64, 32]
-
+train_log = true
 
 [conv2d_3x3_3]
 lr = 0.001
 epochs = 50
 batch_size = 128
-train_log = true
-
-# model
 dropout = 0.2
-
+train_log = true
 
 [conv2d_3x3_1]
 lr = 0.001
 epochs = 50
 batch_size = 128
-train_log = true
-
-# model
 dropout = 0.2
-
+train_log = true
 
 [conv1d_3_3]
 lr = 0.001
 epochs = 50
 batch_size = 128
-train_log = true
-
-# model
 dropout = 0.2
-
+train_log = true
 
 [conv1d_3_1]
 lr = 0.001
 epochs = 50
 batch_size = 128
-train_log = true
-
-# model
 dropout = 0.2
-
+train_log = true
 
 [lstm]
 lr = 0.001
 epochs = 200
 batch_size = 128
-train_log = true
-
-# model
 hidden_dim = 64
 num_layers = 3
 dropout = 0.2
-
+train_log = true
 
 [gru]
 lr = 0.001
 epochs = 30
 batch_size = 128
-train_log = true
-
-# model
 hidden_dim = 64
 num_layers = 3
 dropout = 0.2
-
+train_log = true
 
 [bilstm]
 lr = 0.001
 epochs = 200
 batch_size = 128
-train_log = true
-
-# model
 hidden_dim = 64
 num_layers = 3
 dropout = 0.2
-
+train_log = true
 
 [bigru]
 lr = 0.001
 epochs = 30
 batch_size = 128
-train_log = true
-
-# model
 hidden_dim = 64
 num_layers = 3
 dropout = 0.2
+train_log = true

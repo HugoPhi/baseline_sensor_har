@@ -1,20 +1,26 @@
 import time
 import torch as tc
-import joblib
-from lib.clfs import Clfs
+from plugins.clfs import Clfs
+
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from lightgbm import LGBMClassifier
+from xgboost import XGBClassifier
+from sklearn.svm import SVC
+
+from models import MLP
+from data_process import X_train
 
 
-class MLClfs(Clfs):
-    def __init__(self, model, param_file=None):
-        self.model = model
-        self.param_file = 'model_filename.pkl'
+class SklearnClfs(Clfs):
+    def __init__(self):
+        super(SklearnClfs, self).__init__()
+
+        self.model = None
         self.training_time = -1
         self.testing_time = -1
 
     def fit(self, X_train, y_train, load=False):
-        if load:
-            self.model = joblib.load('model_filename.pkl')
-
         start = time.time()
         self.model.fit(X_train, y_train.ravel())
         end = time.time()
@@ -34,12 +40,6 @@ class MLClfs(Clfs):
         self.testing_time = end - start
         return y_pred
 
-    def get_params(self):
-        hyper = dict()
-        model = self.model.get_params()
-        model = dict(filter(lambda item: not item[0].startswith('base_estimator'), model.items()))  # filt the base_estimator by AdaBoost
-        return hyper, model
-
     def get_training_time(self):
         return self.training_time
 
@@ -47,55 +47,55 @@ class MLClfs(Clfs):
         return self.testing_time
 
 
-class XGBClfs(Clfs):
-    def __init__(self, model, param_file=None):
-        self.model = model
-        self.param_file = 'model_filename.pkl'
-        self.training_time = -1
-        self.testing_time = -1
+class DecisionTreeClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(DecisionTreeClf, self).__init__()
 
-    def fit(self, X_train, y_train, load=False):
-        if load:
-            self.model = joblib.load('model_filename.pkl')
+        self.model = DecisionTreeClassifier(**kwargs)
 
-        start = time.time()
-        self.model.fit(X_train, y_train.ravel() - 1)
-        end = time.time()
-        self.training_time = end - start
 
-    def predict(self, x_test):
-        start = time.time()
-        y_pred = self.model.predict(x_test)
-        end = time.time()
-        self.testing_time = end - start
-        return y_pred.squeeze() + 1
+class RandomForestClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(RandomForestClf, self).__init__()
 
-    def predict_proba(self, x_test):
-        start = time.time()
-        y_pred = self.model.predict_proba(x_test)
-        end = time.time()
-        self.testing_time = end - start
-        return y_pred
+        self.model = RandomForestClassifier(**kwargs)
 
-    def get_params(self):
-        hyper = dict()
-        model = self.model.get_params()
-        return hyper, model
 
-    def get_training_time(self):
-        return self.training_time
+class XGBClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(XGBClf, self).__init__()
 
-    def get_testing_time(self):
-        return self.testing_time
+        self.model = XGBClassifier(**kwargs)
+
+
+class AdaBoostClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(AdaBoostClf, self).__init__()
+
+        self.model = AdaBoostClassifier(**kwargs, estimator=DecisionTreeClassifier(max_depth=7))
+
+
+class LGBMClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(LGBMClf, self).__init__()
+
+        self.model = LGBMClassifier(**kwargs)
+
+
+class SVClf(SklearnClfs):
+    def __init__(self, **kwargs):
+        super(SVClf, self).__init__()
+
+        self.model = SVC(**kwargs)
 
 
 class MLPClf(Clfs):
-    def __init__(self, epochs, lr, model):
-        self.params = {key: value for key, value in locals().items() if key != 'self' and key != 'model'}  # 这里保证可以复刻这个Clf
+    def __init__(self, epochs, lr):
+        super(MLPClf, self).__init__()
 
         self.epochs = epochs
         self.lr = lr
-        self.model = model
+        self.model = MLP(input_size=X_train.shape[1], output_size=6)
 
         # 定义损失函数和优化器
         self.criterion = tc.nn.CrossEntropyLoss()
@@ -104,7 +104,7 @@ class MLPClf(Clfs):
     def fit(self, X_train, y_train, load=False):
         # 训练循环
         X_train_tensor = tc.tensor(X_train, dtype=tc.float32)
-        y_train_tensor = tc.tensor(y_train - 1, dtype=tc.long).reshape(-1)
+        y_train_tensor = tc.tensor(y_train, dtype=tc.long).reshape(-1)
         start = time.time()
         for epoch in range(self.epochs):
             self.optimizer.zero_grad()
@@ -140,12 +140,7 @@ class MLPClf(Clfs):
             y_pred = test_outputs.argmax(dim=1).numpy()
         end = time.time()
         self.testing_time = end - start
-        return y_pred.squeeze() + 1  # class from [1, 2, 3, 4, 5, 6]
-
-    def get_params(self):
-        hyper = self.params
-        model = dict()
-        return hyper, model
+        return y_pred.squeeze()  # class from [0, 1, 2, 3, 4, 5]
 
     def get_training_time(self):
         return self.training_time

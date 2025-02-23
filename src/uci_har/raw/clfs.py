@@ -1,7 +1,10 @@
 import torch
 from torch import nn
 import time
-from lib.clfs import Clfs
+from plugins.clfs import Clfs
+
+from data_process import X_train  # get dataset
+from models import mlp, Conv1d_3x_3, Conv2d_3x3_3, Conv2d_3x3_1, Conv1d_3x_1, BasicLSTM, BasicGRU, BiGRU, BiLSTM
 
 
 class NNClfs(Clfs):
@@ -20,22 +23,20 @@ class NNClfs(Clfs):
       - pre_trained(str='./model.m5'): 训练好的模型的文件路径
     '''
 
-    def __init__(self, lr, epochs, batch_size, model, train_log=False, pre_trained='./model.m5'):
-        self.train_log = train_log
-        self.params = {key: value for key, value in locals().items() if key != 'self' and key != 'model'}  # 这里保证可以复刻这个Clf
+    def __init__(self, lr, epochs, batch_size, train_log=False):
+        super(NNClfs, self).__init__()
 
+        self.train_log = train_log
         self.epochs = epochs
         self.batch_size = batch_size
-
-        self.pre_trained = pre_trained
 
         self.training_time = -1
         self.testing_time = -1
 
-        self.model = model
+        self.model = None
 
-        self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+        self.criterion = None
+        self.optimizer = None
 
     def xpip(self, x):
         '''
@@ -84,11 +85,6 @@ class NNClfs(Clfs):
         self.testing_time = time.time() - start_time
         return outputs.numpy()
 
-    def get_params(self):
-        hyper = self.params
-        model = self.model.out_params
-        return hyper, model
-
     def get_training_time(self):
         return self.training_time
 
@@ -97,32 +93,185 @@ class NNClfs(Clfs):
 
 
 class MLPClf(NNClfs):
-    def __init__(self, *args, **dargs):
-        super(MLPClf, self).__init__(*args, **dargs)
+    def __init__(self, lr, epochs, batch_size,
+                 hidden_dims,
+                 dropout=0.2,
+                 train_log=False):
+        super(MLPClf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = mlp(
+            input_dim=X_train.shape[1] * X_train.shape[2],
+            hidden_dims=hidden_dims,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
     def xpip(self, x):
         return x.reshape(x.shape[0], -1)
 
 
-class Conv2dClf(NNClfs):
-    def __init__(self, *args, **dargs):
-        super(Conv2dClf, self).__init__(*args, **dargs)
+class Conv2d_3x3_1_Clf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 dropout=0.2,
+                 train_log=False):
+        super(Conv2d_3x3_1_Clf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = Conv2d_3x3_1(
+            input_height=X_train.shape[1],
+            input_width=X_train.shape[2],
+            input_channels=1,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
     def xpip(self, x):
         return x.reshape(x.shape[0], 1, x.shape[1], x.shape[2])
 
 
-class Conv1dClf(NNClfs):
-    def __init__(self, *args, **dargs):
-        super(Conv1dClf, self).__init__(*args, **dargs)
+class Conv2d_3x3_3_Clf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 dropout=0.2,
+                 train_log=False):
+        super(Conv2d_3x3_3_Clf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = Conv2d_3x3_3(
+            input_height=X_train.shape[1],
+            input_width=X_train.shape[2],
+            input_channels=1,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
     def xpip(self, x):
-        return x
+        return x.reshape(x.shape[0], 1, x.shape[1], x.shape[2])
 
 
-class RNNClf(NNClfs):
-    def __init__(self, *args, **dargs):
-        super(RNNClf, self).__init__(*args, **dargs)
+class Conv1d_3x_1_Clf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 dropout=0.2,
+                 train_log=False):
+        super(Conv1d_3x_1_Clf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = Conv1d_3x_1(
+            input_width=X_train.shape[2],
+            input_channels=X_train.shape[1],
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+
+
+class Conv1d_3x_3_Clf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 dropout=0.2,
+                 train_log=False):
+        super(Conv1d_3x_3_Clf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = Conv1d_3x_3(
+            input_width=X_train.shape[2],
+            input_channels=X_train.shape[1],
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+
+
+class LSTMClf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 hidden_dim, num_layers,
+                 dropout=0.2,
+                 train_log=False):
+        super(LSTMClf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = BasicLSTM(
+            input_dim=X_train.shape[1],
+            hidden_dim=hidden_dim,
+            num_layers=num_layers,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+
+    def xpip(self, x):
+        return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
+
+
+class GRUClf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 hidden_dim, num_layers,
+                 dropout=0.2,
+                 train_log=False):
+        super(GRUClf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = BasicGRU(
+            input_dim=X_train.shape[1],
+            hidden_dim=hidden_dim,
+            num_layers=num_layers,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+
+    def xpip(self, x):
+        return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
+
+
+class BiLSTMClf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 hidden_dim, num_layers,
+                 dropout=0.2,
+                 train_log=False):
+        super(BiLSTMClf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = BiLSTM(
+            input_dim=X_train.shape[1],
+            hidden_dim=hidden_dim,
+            num_layers=num_layers,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
+
+    def xpip(self, x):
+        return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
+
+
+class BiGRUClf(NNClfs):
+    def __init__(self, lr, epochs, batch_size,
+                 hidden_dim, num_layers,
+                 dropout=0.2,
+                 train_log=False):
+        super(BiGRUClf, self).__init__(lr, epochs, batch_size, train_log)
+
+        self.model = BiGRU(
+            input_dim=X_train.shape[1],
+            hidden_dim=hidden_dim,
+            num_layers=num_layers,
+            output_dim=6,
+            dropout=dropout
+        )
+
+        self.criterion = nn.CrossEntropyLoss()
+        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
     def xpip(self, x):
         return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)

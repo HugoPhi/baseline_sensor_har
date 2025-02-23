@@ -31,11 +31,11 @@ X_test = np.transpose(np.array(X_test), (1, 0, 2))
 X_test = tc.tensor(X_test)
 
 
-y_train = pd.read_csv('../data/train/y_train.txt', header=None).to_numpy().squeeze()
-y_test = pd.read_csv('../data/test/y_test.txt', header=None).to_numpy().squeeze()
+y_train = pd.read_csv('../data/train/y_train.txt', header=None).to_numpy().squeeze() - 1
+y_test = pd.read_csv('../data/test/y_test.txt', header=None).to_numpy().squeeze() - 1
 
 # 将标签转换为 one-hot 编码
-y_train = tc.nn.functional.one_hot(tc.tensor(y_train - 1), 6)
+y_train = tc.nn.functional.one_hot(tc.tensor(y_train), 6)
 
 print('X_train 形状:', X_train.shape)  # 应为 (7352, 9, 128)
 print('y_train 形状:', y_train.shape)  # 应为 (7352, 6)

@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name="lib",
+    name="plugins",
     version="0.1",
-    packages=['tools'],
+    packages=['plugins'],
     install_requires=[],
 )

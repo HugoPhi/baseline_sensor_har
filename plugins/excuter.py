@@ -13,7 +13,7 @@ class Excuter:
     ==========
       - 快捷管理训练，测试，日志全过程，并灵活调试Classifier数组里面的各个模型。
       - 开启Log，支持中途运行出错，结果不丢失。
-      - 在使用的时候需要根据metric_list重写excute(self)方法。
+      - 在使用的时候根据需要重写excute(self)方法。
 
     Parameters
     ----------
@@ -37,7 +37,7 @@ class Excuter:
 
     def __init__(self, X_train, y_train, X_test, y_test,
                  clf_dict: dict,
-                 metric_list=['acc', 'macro_f1', 'micro_f1', 'avg_recall'],
+                 metric_list=['accuracy', 'macro_f1', 'micro_f1', 'avg_recall'],
                  log=False,
                  log_dir='./log/'):
         '''
@@ -68,8 +68,10 @@ class Excuter:
         self.X_test = X_test
         self.y_test = y_test
         self.clf_dict = clf_dict
+        self.metric_list = metric_list
+        self.log = log
 
-        self.df = pd.DataFrame(columns=['model'] + metric_list + ['time'])
+        self.df = pd.DataFrame(columns=['model'] + self.metric_list + ['training time'] + ['testing time'])
 
         # log
         if log:
@@ -82,7 +84,7 @@ class Excuter:
 
             hyper_config = dict()
             for name, clf in clf_dict.items():
-                hyper_config[name]['hyper'], hyper_config[name]['model'] = clf.get_params()
+                hyper_config[name] = clf.get_params()
 
             toml.dump(hyper_config, open(os.path.join(self.log_path, 'hyper.toml'), 'w'))  # 保存超参数和模型参数
 
@@ -100,42 +102,67 @@ class Excuter:
 
         Notes
         -----
-          - 需要根据metric_list重新实现的部分。这部分你需要定义一个实验需要做的事情。
-          - 这里必须要做的就是把self.df的更新方式改变，把对应的表头下填入一次实验得到的正确数据。
+          - 这里必须返回一个测试器和一个训练好的分类器，因为写入日志要用。
 
         Parameters
         ----------
         name : str
             实验的名字。
-        clf : lib.clfs.Clfs
-            实验获取的分类器，继承自接口lib.clfs.Clfs。
+        clf : Clfs
+            实验获取的分类器，继承自接口Clfs。
+
+        Returns
+        -------
+        clf : Clfs
+            训练好的分类器。
+        metric: Metrics
+            有记录的Metric实例。
 
         Examples
         --------
 
+        可以这么重写：
         ```python
-        print(f'>> {name}')
+        class MyExcuter(Excuter):
+            def excute(self, name, clf):
+                print(f'>> {name}')
 
-        clf.fit(self.X_train, self.y_train)
-        print(f'Train {name} Cost: {clf.get_training_time():.4f} s')
+                clf.fit(self.X_train, self.y_train)
+                print(f'Train {name} Cost: {clf.get_training_time():.4f} s')
 
-        y_pred = clf.predict_proba(self.X_test)
+                y_pred = clf.predict(self.X_test)
 
-        mtc = Metrics(self.y_test, y_pred)
+                mtc = Metrics(self.y_test, y_pred)
 
-        self.df.loc[len(self.df)] = [name, mtc.accuracy(), mtc.macro_f1(), mtc.micro_f1(), mtc.avg_recall(), clf.get_training_time()]
+                return mtc, clf
         ```
         '''
         print(f'>> {name}')
 
-        clf.fit(self.X_train, self.y_train)
+        clf.fit(self.X_train, self.y_train)  # 训练分类器
         print(f'Train {name} Cost: {clf.get_training_time():.4f} s')
 
-        y_pred = clf.predict_proba(self.X_test)
+        y_pred = clf.predict(self.X_test)
 
-        mtc = Metrics(self.y_test, y_pred)
+        mtc = Metrics(self.y_test, y_pred, proba=False)  # 构建测试器
+        print(f'Testing {name} Cost: {clf.get_testing_time():.4f} s')
 
-        self.df.loc[len(self.df)] = [name, mtc.accuracy(), mtc.macro_f1(), mtc.micro_f1(), mtc.avg_recall(), clf.get_training_time()]
+        return mtc, clf  # 返回测试器和分类器
+
+    def logline(self, name, mtc, clf):
+        '''
+        将某次实验的结果写入日志df。
+        '''
+
+        func_list = []
+        for metric in self.metric_list:
+            func = getattr(mtc, metric, None)
+            if callable(func):
+                func_list.append(func)
+            else:
+                raise ValueError(f'{metric} is not in Metric.')
+
+        self.df.loc[len(self.df)] = [name] + [func() for func in func_list] + [clf.get_training_time(), clf.get_testing_time()]
 
     def run(self, key):
         '''
@@ -147,7 +174,9 @@ class Excuter:
             实验的名字。
         '''
         if key in self.clf_dict.keys():
-            self.excute(key, self.clf_dict[key])
+            mtc, clf = self.excute(key, self.clf_dict[key])
+
+            self.logline(key, mtc, clf)
         else:
             raise KeyError(f'{key} is not in clf_dict')
 
@@ -159,30 +188,47 @@ class Excuter:
         -------
         name : str
             实验的名字。
-        clf : lib.clfs.Clfs
-            实验获取的分类器，继承自接口lib.clfs.Clfs。
+        clf : Clfs
+            实验获取的分类器，继承自接口Clfs。
         '''
         if len(self.clf_dict) == 0:
             return None
 
         try:
             name, clf = self.clf_dict.popitem()
-            self.excute(name, clf)
+
+            mtc, clf = self.excute(name, clf)
+
+            self.logline(name, mtc, clf)
+
             return name, clf
         except Exception as e:
             print(f'Error: {e}')
             traceback.print_exc()
 
-    def run_all(self):
+    def run_all(self, sort_by=None, ascending=False):
         '''
         运行所有实验。
+
+        Parameters
+        ----------
+        sort_by : str
+            按照哪个指标进行排序。
+        ascending : bool
+            是否升序。
         '''
+
         for name, clf in self.clf_dict.items():
-            self.excute(name, clf)
+            mtc, clf = self.excute(name, clf)
 
-        print(self.df.sort_values('acc', ascending=False))
+            self.logline(name, mtc, clf)
 
-    def result(self):
+        if sort_by is not None:
+            print(self.df.sort_values(sort_by, ascending=ascending))
+        else:
+            print(self.df)
+
+    def get_result(self):
         '''
         返回实验结果对应的表格。
 

@@ -22,7 +22,7 @@ class Metrics:
     ```
     '''
 
-    def __init__(self, y, y_pred):
+    def __init__(self, y, y_pred, proba=True):
         '''
         初始化。
 
@@ -32,7 +32,11 @@ class Metrics:
             真实标签。
         y_pred : np.ndarray
             预测标签。
+        proba : bool
+            输入是否为概率向量。
         '''
+
+        self.proba = proba
         self.y = y
         self.y_pred = y_pred
         uni = np.unique(self.y)
@@ -42,8 +46,13 @@ class Metrics:
         self.classes = uni.shape[0]  # get classes num
 
         self.matrix = np.zeros((self.classes, self.classes))  # get confusion matrix
-        for i, j in zip(y, np.argmax(y_pred, axis=1)):
-            self.matrix[i, j] += 1
+
+        if self.proba:
+            for i, j in zip(y, np.argmax(y_pred, axis=1)):
+                self.matrix[i, j] += 1
+        else:
+            for i, j in zip(y, y_pred):
+                self.matrix[i, j] += 1
 
     def precision(self):
         '''
@@ -102,7 +111,7 @@ class Metrics:
 
     def roc(self):
         '''
-        Compute the ROC curve for each class.
+        Compute the ROC curve for each class. Only callable when 'proba == Ture'
 
         Uses the one-vs-rest ('ovr') approach and returns the AUC for each class.
 
@@ -112,6 +121,9 @@ class Metrics:
             A list where each element is a tuple containing true positive rates (TPR)
             and false positive rates (FPR) for each class.
         '''
+
+        if not self.proba:
+            raise ValueError('roc() can only be called when proba == True')
 
         def calculate_tpr_fpr(y_true, y_pred):
             tp = np.sum((y_pred == 1) & (y_true == 1))
@@ -141,7 +153,7 @@ class Metrics:
 
     def auc(self):
         '''
-        Compute the AUC for each class.
+        Compute the AUC for each class. Only callable when 'proba == Ture'
 
         Uses the one-vs-rest ('ovr') approach to calculate the AUC for each class.
 
@@ -150,6 +162,9 @@ class Metrics:
         numpy.ndarray
             The AUC of each class.
         '''
+
+        if not self.proba:
+            raise ValueError('auc() can only be called when proba == True')
 
         rocs = self.roc()
         aucs = []
@@ -163,7 +178,7 @@ class Metrics:
 
     def ap(self):
         '''
-        Compute the Average Precision (AP) for each class.
+        Compute the Average Precision (AP) for each class. Only callable when 'proba == Ture'
 
         Uses the one-vs-rest ('ovr') approach to calculate the AP for each class.
 
@@ -172,6 +187,9 @@ class Metrics:
         numpy.ndarray
             The average precision (AP) of each class.
         '''
+
+        if not self.proba:
+            raise ValueError('ap() can only be called when proba == True')
 
         def calculate_prec_rec(y_true, y_pred):
             tp = np.sum((y_pred == 1) & (y_true == 1))
@@ -203,13 +221,16 @@ class Metrics:
 
     def avg_ap(self):
         '''
-        Compute the average of average precision (AP) scores.
+        Compute the average of average precision (AP) scores. Only callable when 'proba == Ture'
 
         Returns
         -------
         float
             The mean average precision score across all classes.
         '''
+
+        if not self.proba:
+            raise ValueError('avg_ap() can only be called when proba == True')
 
         return self.ap().mean()
 
@@ -307,7 +328,7 @@ class Metrics:
             print(f'Class {i} {table}{self.precision()[i]:.6f} {table}{self.recall()[i]:.6f}{table}{self.f1()[i]:.6f}')
         print()
         print(f'Accuracy      {self.accuracy():.6f}')
-        print(f'Macro avg     {self.macro_avg():.6f}')
-        print(f'Micro avg     {self.micro_avg():.6f}')
+        print(f'Macro F1      {self.macro_f1():.6f}')
+        print(f'Micro F1      {self.micro_f1():.6f}')
 
         return ''

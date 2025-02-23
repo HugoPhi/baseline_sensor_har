@@ -17,8 +17,8 @@ Figure 1: Overview of deeplearning for HAR [1]
 
 这是目前的进度： 
 
-- 🚧(DOING) UCI HAR [\[link\]](https://www.kaggle.com/datasets/drsaeedmohsen/ucihar-dataset)
-- WISDOM [\[link\]](https://archive.ics.uci.edu/ml/datasets/WISDM+Smartphone+and+Smartwatch+Activity+and+Biometrics+Dataset+)
+- 🚧(DOING) UCI HAR [\[link\]](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones)
+- WISDOM [\[link\]](https://archive.ics.uci.edu/dataset/507/wisdm+smartphone+and+smartwatch+activity+and+biometrics+dataset)
 - PAMAP2 [\[link\]](http://archive.ics.uci.edu/ml/datasets/pamap2+physical+activity+monitoring)
 - OPPORTUNITY [\[link\]](https://archive.ics.uci.edu/ml/datasets/opportunity+activity+recognition)
 - UNIMIB-SHAR [\[link\]](http://www.sal.disco.unimib.it/technologies/unimib-shar/)

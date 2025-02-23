@@ -6,9 +6,9 @@ mlp
 '''
 
 
-class MLP(nn.Module):
+class mlp(nn.Module):
     def __init__(self, input_dim, hidden_dims, output_dim, dropout=0.5):
-        super(MLP, self).__init__()
+        super(mlp, self).__init__()
 
         self.out_params = {key: value for key, value in locals().items() if key != 'self' and key != '__class__'}  # 这里保证可以复刻模型
 
