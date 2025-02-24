@@ -1,5 +1,5 @@
 import toml
-from plugins.excuter import Executer
+from plugins.executer import Executer
 
 from data_process import X_train, y_train, X_test, y_test
 from clfs import DecisionTreeClf, RandomForestClf, XGBClf, AdaBoostClf, SVClf, LGBMClf, MLPClf

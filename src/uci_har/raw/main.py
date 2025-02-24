@@ -1,7 +1,7 @@
 import toml
 from data_process import X_train, y_train, X_test, y_test  # get dataset
 
-from plugins.excuter import Executer
+from plugins.executer import Executer
 from clfs import MLPClf, Conv1d_3x_1_Clf, Conv1d_3x_3_Clf, Conv2d_3x3_1_Clf, Conv2d_3x3_3_Clf, LSTMClf, GRUClf, BiLSTMClf, BiGRUClf
 
 configs = toml.load('./hyper.toml')
