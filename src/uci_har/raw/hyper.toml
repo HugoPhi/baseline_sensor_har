@@ -63,7 +63,7 @@ dropout = 0.2
 
 [gru]
 lr = 0.001
-epochs = 30
+epochs = 100
 batch_size = 128
 train_log = true
 
@@ -87,7 +87,7 @@ dropout = 0.2
 
 [bigru]
 lr = 0.001
-epochs = 30
+epochs = 100
 batch_size = 128
 train_log = true
 

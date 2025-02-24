@@ -1,5 +1,5 @@
 import toml
-from plugins.excuter import Excuter
+from plugins.excuter import Executer
 
 from data_process import X_train, y_train, X_test, y_test
 from clfs import DecisionTreeClf, RandomForestClf, XGBClf, AdaBoostClf, SVClf, LGBMClf, MLPClf
@@ -18,8 +18,8 @@ clfs = {
 }
 
 
-exc = Excuter(X_train, y_train, X_test, y_test,
-              clf_dict=clfs,
-              log=True,
-              log_dir='./log/')
+exc = Executer(X_train, y_train, X_test, y_test,
+               clf_dict=clfs,
+               log=True,
+               log_dir='./log/')
 exc.run_all(sort_by='accuracy', ascending=False)

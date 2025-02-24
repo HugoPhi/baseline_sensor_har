@@ -2,7 +2,10 @@ from setuptools import setup
 
 setup(
     name="plugins",
-    version="0.1",
+    version="v0.3.2",
     packages=['plugins'],
-    install_requires=[],
+    install_requires=[
+        'numpy',
+        'toml'
+    ],
 )
