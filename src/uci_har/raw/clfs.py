@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 import time
-from plugins.clfs import Clfs
+from plugins.lrkit.clfs import Clfs, timing
 
 from data_process import X_train  # get dataset
 from models import mlp, Conv1d_3x_3, Conv2d_3x3_3, Conv2d_3x3_1, Conv1d_3x_1, BasicLSTM, BasicGRU, BiGRU, BiLSTM
@@ -29,9 +29,6 @@ class NNClfs(Clfs):
         self.train_log = train_log
         self.epochs = epochs
         self.batch_size = batch_size
-
-        self.training_time = -1
-        self.testing_time = -1
 
         self.model = None
 
@@ -67,29 +64,21 @@ class NNClfs(Clfs):
             self.model.load_state_dict(torch.load(self.pre_trained))
             print('Pre-trained model loaded.')
 
+    @timing
     def predict(self, X_test):
-        start_time = time.time()
         with torch.no_grad():
             self.model.eval()
             outputs = self.model(self.xpip(X_test).float())
             _, predicted = torch.max(outputs.data, 1)
-        self.testing_time = time.time() - start_time
         return predicted.numpy()
 
+    @timing
     def predict_proba(self, X_test):
-        start_time = time.time()
         with torch.no_grad():
             self.model.eval()
             outputs = self.model(self.xpip(X_test).float())
             outputs = torch.nn.functional.softmax(outputs, dim=1)
-        self.testing_time = time.time() - start_time
         return outputs.numpy()
-
-    def get_training_time(self):
-        return self.training_time
-
-    def get_testing_time(self):
-        return self.testing_time
 
 
 class MLPClf(NNClfs):
