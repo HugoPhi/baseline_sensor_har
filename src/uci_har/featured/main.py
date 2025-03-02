@@ -7,19 +7,14 @@ from clfs import DecisionTreeClf, RandomForestClf, XGBClf, AdaBoostClf, SVClf, L
 
 config = toml.load('./hyper.toml')
 
-clfs = {
-    'DecisionTree': DecisionTreeClf(**config['DecisionTree']),
-    'RandomForest': RandomForestClf(**config['RandomForest']),
-    'XGBoost': XGBClf(**config['XGBoost']),
-    'AdaBoost': AdaBoostClf(**config['AdaBoost']),
-    'SVM': SVClf(**config['SVM']),
-    'LightGBM': LGBMClf(**config['LightGBM']),
-    'MLP': MLPClf(**config['MLP'])
-}
+clf_name = ['DecisionTree', 'RandomForest', 'XGBoost', 'AdaBoost', 'SVM', 'LightGBM', 'MLP']
+clf_list = [DecisionTreeClf, RandomForestClf, XGBClf, AdaBoostClf, SVClf, LGBMClf, MLPClf]
 
+clfs = {k: v(**config[k]) for k, v in zip(clf_name, clf_list)}
 
 exc = Executer(X_train, y_train, X_test, y_test,
                clf_dict=clfs,
-               log=True,
+               log=False,
                log_dir='./log/')
+
 exc.run_all(sort_by='accuracy', ascending=False)
