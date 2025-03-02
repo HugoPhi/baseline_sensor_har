@@ -1,5 +1,5 @@
+from plugins.lrkit.executer import Executer
 import toml
-from plugins.executer import Executer
 
 from data_process import X_train, y_train, X_test, y_test
 from clfs import DecisionTreeClf, RandomForestClf, XGBClf, AdaBoostClf, SVClf, LGBMClf, MLPClf
