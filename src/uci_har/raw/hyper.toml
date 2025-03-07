@@ -50,15 +50,15 @@ dropout = 0.2
 
 
 [lstm]
-lr = 0.001
-epochs = 200
-batch_size = 128
+lr = 0.01
+epochs = 100 
+batch_size = 256
 train_log = true
 
 # model
-hidden_dim = 64
-num_layers = 3
-dropout = 0.2
+hidden_dim = 32
+num_layers =  3
+dropout = 0
 
 
 [gru]
