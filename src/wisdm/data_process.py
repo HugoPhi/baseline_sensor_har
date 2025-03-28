@@ -141,7 +141,7 @@ if True:
             plt.legend()
 
         plt.tight_layout()
-        plt.savefig(f'./plots/raw/raw/user_{usr}.svg', format='svg')
+        plt.savefig(f'./plots/raw/raw/user_{usr}.png')
         plt.close()
 
 
@@ -188,7 +188,7 @@ def get_data(time_steps=128, tolerance=20):
             print(f'  >> action {act}:')
 
             act_list = usr_list[usr_list[:, 1] == act]
-            data_dict[f'u_{int(usr)}_a_{int(act)}'] = np.array(convert(usr, act, act_list)).reshape(-1, TIME_LEN, 6)
+            data_dict[f'u_{int(usr)}_a_{int(act)}'] = np.array(convert(usr, act, act_list)).reshape(-1, time_steps, 6)
 
     return data_dict
 
@@ -235,15 +235,20 @@ if False:
 Make Train, Test Dataset
 '''
 
-# data_dict = get_data(
-#     time_steps=128,
-#     tolerance=20
-# )
-#
-# data = np.concatenate(list(data_dict.values()), axis=0)  # (num, 128, 6)
-#
-# rate = 0.8
-# train, test = data[:int(data.shape[0] * rate)], data[int(data.shape[0] * rate):]
-#
-# X_train, y_train = train[:, :, 3:], train[:, :, 1]
-# X_test, y_test = test[:, :, 3:], test[:, :, 1]
+data_dict = get_data(
+    time_steps=128,
+    tolerance=20
+)
+
+data = np.concatenate(list(data_dict.values()), axis=0)  # (num, 128, 6)
+
+rate = 0.8
+train, test = data[:int(data.shape[0] * rate)], data[int(data.shape[0] * rate):]
+
+X_train, y_train = train[:, :, 3:], train[:, :, 1]
+X_test, y_test = test[:, :, 3:], test[:, :, 1]
+
+print(f'Shape of X_train: {X_train.shape}')
+print(f'Shape of y_train: {y_train.shape}')
+print(f'Shape of X_test: {X_test.shape}')
+print(f'Shape of y_test: {y_test.shape}')
