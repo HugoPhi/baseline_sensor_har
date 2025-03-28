@@ -1,106 +1,249 @@
-'''
-csv like.
-
-data_dir/
-  phone/
-    gyro/
-        data_16{$id}_gyro_phone.txt
-    accel/
-        data_16{$id}_accel_phone.txt
-  watch/
-    gyro/
-        data_16{$id}_gyro_phone.txt
-    accel/
-        data_16{$id}_accel_phone.txt
-
-
-Parameters
-----------
-$id : 0 ~ 50
-'''
-
-
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
-from io import StringIO
+import os
+# import kagglehub
+
+# path = kagglehub.dataset_download("piyanit/wisdm-ar-v11")
+path = '/home/tibless/.cache/kagglehub/datasets/piyanit/wisdm-ar-v11/versions/1'
+print("Path to dataset files:", path)
 
 
-labels = {
-    "A": "walking",
-    "B": "jogging",
-    "C": "stairs",
-    "D": "sitting",
-    "E": "standing",
-    "F": "typing",
-    "G": "teeth",
-    "H": "soup",
-    "I": "chips",
-    "J": "pasta",
-    "K": "drinking",
-    "L": "sandwich",
-    "M": "kicking",
-    "O": "catch",
-    "P": "dribbling",
-    "Q": "writing",
-    "R": "clapping",
-    "S": "folding",
+action2id = {
+    'Walking': 0,
+    'Jogging': 1,
+    'Upstairs': 2,
+    'Downstairs': 3,
+    'Sitting': 4,
+    'Standing': 5,
 }
 
-key2num = {v: k for k, v in enumerate(labels.keys())}  # key -> number
-num2value = {k: v for k, v in enumerate(labels.items())}  # number -> value
+processed_list = []
 
-gyro_column = ['usr id', 'label', 'time stamp', 'gyro-x', 'gyro-y', 'gyro-z']
-accel_column = ['usr id', 'label', 'time stamp', 'acc-x', 'acc-y', 'acc-z']
+'''
+Data Clean
+'''
 
-data_dir = './data/wisdm-dataset/raw/'
-phone = data_dir + 'phone/'
-watch = data_dir + 'watch/'
+with open(path + '/WISDM_ar_v1.1_raw.txt') as f:
+    for ix, line in enumerate(f.read().strip().split(';')):
+        if not line:
+            print(f'ended at line: {ix}')
+            break
 
-# phone
-k_x_phone = []
-k_y_phone = []
-k_timestamp_phone = []
-for id in range(50):
-    with open(phone + f'gyro/data_16{id:02d}_gyro_phone.txt', 'r') as file:
-        data = file.readlines()
-    cleaned_data = [line.rstrip(';\n') for line in data]
-    cleaned_data_str = "\n".join(cleaned_data)
+        line = line.split(',')
 
-    gyro_df = pd.read_csv(StringIO(cleaned_data_str), header=None)
-    gyro_df.columns = gyro_column
-    gyro_y = gyro_df['label']
+        line[0] = int(line[0])
+        line[1] = action2id[line[1]]
+        line[2] = int(line[2])
+        line[3] = float(line[3])
+        line[4] = float(line[4])
+        line[5] = float(line[5])
 
-    with open(phone + f'accel/data_16{id:02d}_accel_phone.txt', 'r') as file:
-        data = file.readlines()
-    cleaned_data = [line.rstrip(';\n') for line in data]
-    cleaned_data_str = "\n".join(cleaned_data)
+        if ix == 343419:
+            '''
+            error while reading: 343419: [11, 0, 1867172313000, 4.4, 4.4, 11.0, 'Walking', '1867222270000', '5.48', '8.43', '9.724928']
+            '''
 
-    acc_df = pd.read_csv(StringIO(cleaned_data_str), header=None)
-    acc_df.columns = accel_column
-    acc_y = acc_df['label']
-    timestamp = acc_df['time stamp']
-    k_timestamp_phone.append(timestamp)
+            # line.append([11, 0, 1867172313000, 4.4, 4.4, 11.0])
+            line.append([11, 0, 1867222270000, 5.48, 8.43, 9.724928])
+            continue
+        if len(line) == 7 and line[-1] == '':
+            '''
+            error while reading: 844623: [21, 1, 117687383612000, -0.38, 7.59, 2.49, '']
+            error while reading: 844624: [21, 1, 117687421515000, 0.8, 9.43, 0.08, '']
+            error while reading: 844625: [21, 1, 117687461707000, 0.5, 8.16, 0.95, '']
+            error while reading: 844626: [21, 1, 117687541571000, 1.76, 9.43, 1.92, '']
+            error while reading: 844627: [21, 1, 117687581519000, 0.91, 8.66, 1.08, '']
+            error while reading: 844628: [21, 1, 117687621527000, 0.89, 8.54, 2.49, '']
+            error while reading: 844629: [21, 1, 117687701514000, 3.17, 9.0, 1.23, '']
+            error while reading: 844630: [21, 1, 117687741522000, 0.65, 9.11, 1.5, '']
+            error while reading: 844631: [21, 1, 117687782111000, -1.04, 10.15, 1.65, '']
+            error while reading: 844632: [21, 1, 117687861578000, 3.21, 7.86, 0.04, '']
+            error while reading: 844633: [21, 1, 117687861578000, 3.21, 9.81, -0.8, '']
+            '''
 
-    if True:
-        print(acc_df)
-        print(gyro_df)
-        # print(gyro_y.equals(acc_y))  # 两个label不是一样的
+            line.pop(-1)
+        if line[2] == 0:
+            '''
+            error while reading: 316349: [18, 2, 0, 0.0, 0.0, 0.0]
+            error while reading: 316350: [18, 2, 0, 0.0, 0.0, 0.0]
+            error while reading: 316360: [18, 2, 0, 0.0, 0.0, 0.0]
+            error while reading: 400441: [10, 0, 0, 0.0, 0.0, 0.0]
+            error while reading: 413090: [10, 0, 0, 0.0, 0.0, 0.0]
+            error while reading: 426628: [10, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 429524: [10, 2, 0, 0.0, 0.0, 0.0]
+            error while reading: 430607: [10, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 431569: [10, 2, 0, 0.0, 0.0, 0.0]
+            error while reading: 432678: [10, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 433664: [10, 5, 0, 0.0, 0.0, 0.0]
+            error while reading: 684889: [4, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 684890: [4, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 780744: [8, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 882380: [3, 0, 0, 0.0, 0.0, 0.0]
+            error while reading: 882381: [3, 0, 0, 0.0, 0.0, 0.0]
+            error while reading: 882382: [3, 0, 0, 0.0, 0.0, 0.0]
+            error while reading: 938217: [22, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 938218: [22, 3, 0, 0.0, 0.0, 0.0]
+            error while reading: 1091332: [19, 3, 0, 0.0, 0.0, 0.0]
+            '''
+            print(f'error while reading: {ix}: {line}')
+            continue
+        elif len(line) != 6:
+            print(f'error while reading: {ix}: {line}')
+            continue
 
-    continue
-    k_x_phone.append(pd.concat([acc_df[accel_column[-3:]], gyro_df[gyro_column[-3:]]], axis=1))  # 合并两张表
+        processed_list.append(line)
 
-    acc_y = acc_y.map(key2num).astype(int)  # 从0到17一共18类
-    k_y_phone.append(acc_y)
 
-    if True:
-        print(k_x_phone[-1])
-        print(k_y_phone[-1])
+processed_list = pd.DataFrame(processed_list)
+processed_list.columns = ['user_id', 'label', 'time', 'acc-x', 'acc-y', 'acc-z']
+print('>> info: ')
+processed_list.info()
 
-    x = k_x_phone[-1].to_numpy()
-    timestamp = timestamp.to_numpy()
-    timestamp = timestamp - timestamp[0]
-    print(timestamp)
-    exit(0)
-    for axis in range(5):
-        plt.plot(timestamp, x[:, axis].reshape(-1, 1))
-    plt.show()
+
+'''
+Plot
+'''
+
+processed_list = processed_list.to_numpy()
+
+if True:
+    TIME_LEN = 128
+    START_FRAME = 2344
+    for usr in np.unique(processed_list[:, 0]):
+        print(f'>> user {usr}:')
+        usr_list = processed_list[processed_list[:, 0] == usr]
+
+        plt.figure(figsize=(18, 6))
+        for act in np.unique(usr_list[:, 1]):
+            print(f'  >> action {act}:')
+
+            act_list = usr_list[usr_list[:, 1] == act]
+            # np.save(path + f'/processed/user_{usr}/action_{act}.npy', act_list)
+
+            plt.subplot(3, 2, int(act + 1))
+
+            # single
+            # plt.plot(act_list[START_FRAME:START_FRAME + TIME_LEN, 2], act_list[START_FRAME:START_FRAME + TIME_LEN, 3], label='acc-x')
+            # plt.plot(act_list[START_FRAME:START_FRAME + TIME_LEN, 2], act_list[START_FRAME:START_FRAME + TIME_LEN, 4], label='acc-y')
+            # plt.plot(act_list[START_FRAME:START_FRAME + TIME_LEN, 2], act_list[START_FRAME:START_FRAME + TIME_LEN, 5], label='acc-z')
+
+            # all
+            plt.plot(act_list[:, 2], act_list[:, 3], label='acc-x')
+            plt.plot(act_list[:, 2], act_list[:, 4], label='acc-y')
+            plt.plot(act_list[:, 2], act_list[:, 5], label='acc-z')
+
+            plt.title(f'User {usr}, Action {act}')
+            plt.xlabel('time')
+            plt.ylabel('acc')
+            plt.title(f'User {usr}, Action {act}')
+            plt.tight_layout()
+            plt.legend()
+
+        plt.tight_layout()
+        plt.savefig(f'./plots/raw/raw/user_{usr}.svg', format='svg')
+        plt.close()
+
+
+'''
+Split
+'''
+
+
+def get_data(time_steps=128, tolerance=20):
+
+    def convert(usr, act, act_list):
+        res = []
+        seq = []
+        last_time = None
+
+        for ix, input in enumerate(act_list):
+            if len(seq) == 0:
+                rate = 1
+            elif len(seq) == 1:
+                rate = 1
+                last_time = input[2] - seq[-1][2]
+            else:
+                rate = (input[2] - seq[-1][2]) / last_time
+                last_time = input[2] - seq[-1][2]
+
+            if (1. / tolerance) <= rate and rate <= tolerance:
+                seq.append(input)
+            else:
+                res += sliding_window(seq, time_steps, time_steps // 2)  # overlap 50%
+                last_time = None
+                seq = [input]
+
+        return res
+
+    def sliding_window(x, step, stride):
+        return [x[i:i + step] for i in range(0, len(x) - step, stride)]  # drop the last one
+
+    data_dict = {}
+    for usr in np.unique(processed_list[:, 0]):
+        print(f'>> user {usr}:')
+        usr_list = processed_list[processed_list[:, 0] == usr]
+
+        for act in np.unique(usr_list[:, 1]):
+            print(f'  >> action {act}:')
+
+            act_list = usr_list[usr_list[:, 1] == act]
+            data_dict[f'u_{int(usr)}_a_{int(act)}'] = np.array(convert(usr, act, act_list)).reshape(-1, TIME_LEN, 6)
+
+    return data_dict
+
+
+if False:
+    TIME_LEN = 128
+    TOLERANCE = 20
+    sum = 0
+
+    data_dict = get_data(TIME_LEN, TOLERANCE)
+
+    for k, v in data_dict.items():
+        sum += v.shape[0]
+        print(f'{k}: {v.shape}')
+
+    print(f'total: {sum}')
+
+    for k, v in data_dict.items():
+        user, action = k.split('_')[1], k.split('_')[3]
+
+        if not os.path.exists('./plots/raw/splited'):
+            os.makedirs('./plots/raw/splited')
+
+        if v.shape[0] == 0:
+            continue
+
+        for ix, x in enumerate(v):
+            if ix <= 3:
+                plt.figure(figsize=(18, 6))
+                plt.plot(x[:, 2], x[:, 3], label='acc-x')
+                plt.plot(x[:, 2], x[:, 4], label='acc-y')
+                plt.plot(x[:, 2], x[:, 5], label='acc-z')
+                plt.title(f'User {user}, Action {action}')
+                plt.xlabel('time')
+                plt.ylabel('acc')
+                plt.title(f'User {user}, Action {action}')
+                plt.tight_layout()
+                plt.legend()
+                plt.savefig(f'./plots/raw/splited/{k}_{ix}.svg', format='svg')
+                plt.close()
+
+
+'''
+Make Train, Test Dataset
+'''
+
+# data_dict = get_data(
+#     time_steps=128,
+#     tolerance=20
+# )
+#
+# data = np.concatenate(list(data_dict.values()), axis=0)  # (num, 128, 6)
+#
+# rate = 0.8
+# train, test = data[:int(data.shape[0] * rate)], data[int(data.shape[0] * rate):]
+#
+# X_train, y_train = train[:, :, 3:], train[:, :, 1]
+# X_test, y_test = test[:, :, 3:], test[:, :, 1]

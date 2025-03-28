@@ -1,3 +1,4 @@
+import yaml
 import torch
 from torch import nn
 import time
@@ -5,6 +6,17 @@ from plugins.lrkit.clfs import Clfs, timing
 
 from data_process import X_train  # get dataset
 from models import mlp, Conv1d_3x_3, Conv2d_3x3_3, Conv2d_3x3_1, Conv1d_3x_1, BasicLSTM, BasicGRU, BiGRU, BiLSTM
+
+
+def astag(cls):
+    tag = f'!{cls.__name__}'
+
+    def constructor(loader, node):
+        params = loader.construct_mapping(node)
+        return cls(**params)
+
+    yaml.add_constructor(tag, constructor)
+    return cls
 
 
 class NNClfs(Clfs):
@@ -58,7 +70,7 @@ class NNClfs(Clfs):
                     self.optimizer.step()
 
                 if self.train_log:
-                    print(f'Epoch {epoch+1}/{self.epochs}, Loss: {loss.item()}, Train Acc: {100 * (self.predict(X_train) == torch.argmax(y_train, dim=1)).float().mean().item():.2f}%')
+                    print(f'Epoch {epoch + 1}/{self.epochs}, Loss: {loss.item()}, Train Acc: {100 * (self.predict(X_train) == torch.argmax(y_train, dim=1)).float().mean().item():.2f}%')
             self.training_time = time.time() - start_time
         else:
             self.model.load_state_dict(torch.load(self.pre_trained))
@@ -81,6 +93,7 @@ class NNClfs(Clfs):
         return outputs.numpy()
 
 
+@astag
 class MLPClf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  hidden_dims,
@@ -102,6 +115,7 @@ class MLPClf(NNClfs):
         return x.reshape(x.shape[0], -1)
 
 
+@astag
 class Conv2d_3x3_1_Clf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  dropout=0.2,
@@ -123,6 +137,7 @@ class Conv2d_3x3_1_Clf(NNClfs):
         return x.reshape(x.shape[0], 1, x.shape[1], x.shape[2])
 
 
+@astag
 class Conv2d_3x3_3_Clf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  dropout=0.2,
@@ -144,6 +159,7 @@ class Conv2d_3x3_3_Clf(NNClfs):
         return x.reshape(x.shape[0], 1, x.shape[1], x.shape[2])
 
 
+@astag
 class Conv1d_3x_1_Clf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  dropout=0.2,
@@ -161,6 +177,7 @@ class Conv1d_3x_1_Clf(NNClfs):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
 
+@astag
 class Conv1d_3x_3_Clf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  dropout=0.2,
@@ -178,6 +195,7 @@ class Conv1d_3x_3_Clf(NNClfs):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=lr)
 
 
+@astag
 class LSTMClf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  hidden_dim, num_layers,
@@ -200,6 +218,7 @@ class LSTMClf(NNClfs):
         return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
 
 
+@astag
 class GRUClf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  hidden_dim, num_layers,
@@ -222,6 +241,7 @@ class GRUClf(NNClfs):
         return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
 
 
+@astag
 class BiLSTMClf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  hidden_dim, num_layers,
@@ -244,6 +264,7 @@ class BiLSTMClf(NNClfs):
         return torch.transpose(x, 1, 2)  # 形状是 (batch_size, seq_len, input_dim)
 
 
+@astag
 class BiGRUClf(NNClfs):
     def __init__(self, lr, epochs, batch_size,
                  hidden_dim, num_layers,

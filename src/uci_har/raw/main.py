@@ -1,20 +1,15 @@
-import toml
+import yaml
 from data_process import X_train, y_train, X_test, y_test  # get dataset
 
 from plugins.lrkit.executer import Executer
-from clfs import MLPClf, Conv1d_3x_1_Clf, Conv1d_3x_3_Clf, Conv2d_3x3_1_Clf, Conv2d_3x3_3_Clf, LSTMClf, GRUClf, BiLSTMClf, BiGRUClf
+from clfs import *
 
-configs = toml.load('./hyper.toml')
-
-names = ['mlp', 'conv2d_3x3_3', 'conv2d_3x3_1', 'conv1d_3_3', 'conv1d_3_1', 'lstm', 'gru', 'bilstm', 'bigru']
-models = [MLPClf, Conv2d_3x3_3_Clf, Conv2d_3x3_1_Clf, Conv1d_3x_3_Clf, Conv1d_3x_1_Clf, LSTMClf, GRUClf, BiLSTMClf, BiGRUClf]
-
-clfs = {k: v(**configs[k]) for k, v in zip(names, models)}
+with open('./hyper.yml', 'r') as f:
+    clfs = yaml.unsafe_load(f)
 
 exc = Executer(X_train, y_train, X_test, y_test,
                clf_dict=clfs,
                log=False,
                log_dir='./log/')
-# exc.run_all(sort_by='accuracy', ascending=False)
-exc.run('lstm')
-print(exc.df)
+
+exc.run_all(sort_by='accuracy', ascending=False)

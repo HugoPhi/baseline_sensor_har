@@ -1,3 +1,4 @@
+import yaml
 import torch as tc
 from plugins.lrkit.clfs import Clfs, timing
 
@@ -9,6 +10,20 @@ from sklearn.svm import SVC
 
 from models import MLP
 from data_process import X_train
+
+
+def astag(cls):
+    tag = f'!{cls.__name__}'
+
+    def constructor(loader, node):
+        params = loader.construct_mapping(node)
+        return cls(**params)
+
+    yaml.add_constructor(tag, constructor)
+    return cls
+
+
+DecisionTreeClassifier = astag(DecisionTreeClassifier)
 
 
 class SklearnClfs(Clfs):
@@ -34,6 +49,7 @@ class SklearnClfs(Clfs):
         return y_pred
 
 
+@astag
 class DecisionTreeClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(DecisionTreeClf, self).__init__()
@@ -41,6 +57,7 @@ class DecisionTreeClf(SklearnClfs):
         self.model = DecisionTreeClassifier(**kwargs)
 
 
+@astag
 class RandomForestClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(RandomForestClf, self).__init__()
@@ -48,6 +65,7 @@ class RandomForestClf(SklearnClfs):
         self.model = RandomForestClassifier(**kwargs)
 
 
+@astag
 class XGBClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(XGBClf, self).__init__()
@@ -55,13 +73,16 @@ class XGBClf(SklearnClfs):
         self.model = XGBClassifier(**kwargs)
 
 
+@astag
 class AdaBoostClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(AdaBoostClf, self).__init__()
 
-        self.model = AdaBoostClassifier(**kwargs, estimator=DecisionTreeClassifier(max_depth=7))
+        # self.model = AdaBoostClassifier(**kwargs, estimator=DecisionTreeClassifier(max_depth=7))
+        self.model = AdaBoostClassifier(**kwargs)
 
 
+@astag
 class LGBMClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(LGBMClf, self).__init__()
@@ -69,6 +90,7 @@ class LGBMClf(SklearnClfs):
         self.model = LGBMClassifier(**kwargs)
 
 
+@astag
 class SVClf(SklearnClfs):
     def __init__(self, **kwargs):
         super(SVClf, self).__init__()
@@ -76,6 +98,7 @@ class SVClf(SklearnClfs):
         self.model = SVC(**kwargs)
 
 
+@astag
 class MLPClf(Clfs):
     def __init__(self, epochs, lr):
         super(MLPClf, self).__init__()

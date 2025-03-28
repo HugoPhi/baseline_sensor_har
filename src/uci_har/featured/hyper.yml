@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=./schema.json
+
+seed: &seed
+  239
+
+clfs:
+  DecisionTree: !DecisionTreeClf
+    criterion: "gini"        # 分裂质量的评价标准
+    max_depth: null          # 树的最大深度
+    min_samples_split: 2     # 内部节点再划分所需最小样本数
+    min_samples_leaf: 3      # 叶节点所需的最小样本数
+    random_state: *seed      # 控制随机性以便结果可复现
+
+  RandomForest: !RandomForestClf
+    n_estimators: 50         # 树的数量
+    criterion: "gini"        # 分裂质量的评价标准
+    max_depth: null          # 树的最大深度
+    min_samples_split: 4     # 内部节点再划分所需最小样本数
+    min_samples_leaf: 1      # 叶节点所需的最小样本数
+    bootstrap: true          # 是否进行bootstrap采样
+    random_state: *seed      # 控制随机性以便结果可复现
+
+  XGBoost: !XGBClf
+    n_estimators: 50         # 树的数量
+    max_depth: 5             # 树的最大深度
+    learning_rate: 0.1       # 学习率
+    eval_metric: "logloss"   # 评价指标
+    random_state: *seed      # 控制随机性以便结果可复现
+
+  AdaBoost: !AdaBoostClf
+    n_estimators: 30         # 弱学习器的数量
+    learning_rate: 1.0       # 对每个弱学习器的贡献程度
+    random_state: *seed      # 控制随机性以便结果可复现
+    estimator: !DecisionTreeClassifier
+      max_depth: 7
+
+  SVM: !SVClf
+    C: 0.4                   # 正则化参数
+    kernel: "rbf"            # 核函数类型
+    degree: 3                # 多项式核函数的次数（'poly'时有效）
+    gamma: "scale"           # 核系数（对于'rbf', 'poly', 'sigmoid'有效）
+    probability: true        # 是否启用概率估计
+    random_state: *seed      # 控制随机性以便结果可复现（仅对某些选项有效）
+
+  LightGBM: !LGBMClf
+    n_estimators: 100        # 树的数量
+    max_depth: -1            # 树的最大深度（-1表示没有限制）
+    learning_rate: 0.1       # 学习率
+    num_leaves: 30           # 一棵树上的叶子数
+    random_state: *seed      # 控制随机性以便结果可复现
+    verbose: -1              # 不要打印日志
+
+  MLP: !MLPClf
+    epochs: 1000
+    lr: 0.001
