@@ -1,31 +1,52 @@
 ![paper](./assets/paper.png)
 
 <p align='center'>
-Figure 1: Overview of deeplearning for HAR [1]
 </p>
 
-# ✨ Examples for HAR for Sensors
+# Baselines for Human Activity Recognition
 
-本项目将会以数据集为对象，对基于传感器的HAR的各种Baseline算法进行实现。目前主流的方法有两大类：
+This repo will implement a series of baselines for Human Activity Recognition, including two main technique route: 
 
-- 特征工程+机器学习算法
-- 深度学习算法
+- Manual Feature extraction + Classifier
+- Edge2Edge Deeplearning + Classifier(normally mlp with sofrmax)
 
-项目中都会进行实现。 
+Here are the datasets we use:  
 
-## 🚧 TODO List
+- UCI HAR, [offical web](), [paper]().
+- mHealth, [offical web](), [paper]().
+- PAMAP2, [offical web](), [paper]().
+- OPPORTUNITY, [offical web](), [paper]().
+- WISDM, [offical web](), [paper]().
+- USC HAD, [offical web](), [paper]().
+- skoda, [offical web](), [paper]().
 
-这是目前的进度： 
+## # Route 1
 
-- 🚧(DOING) UCI HAR [\[link\]](https://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones)
-- WISDOM [\[link\]](https://archive.ics.uci.edu/dataset/507/wisdm+smartphone+and+smartwatch+activity+and+biometrics+dataset)
-- PAMAP2 [\[link\]](http://archive.ics.uci.edu/ml/datasets/pamap2+physical+activity+monitoring)
-- OPPORTUNITY [\[link\]](https://archive.ics.uci.edu/ml/datasets/opportunity+activity+recognition)
-- UNIMIB-SHAR [\[link\]](http://www.sal.disco.unimib.it/technologies/unimib-shar/)
-- USC-HAD [\[link\]](https://sipi.usc.edu/had/)
-- mHealth
+- Classifiers
+    - Decision Tree
+    - Random Forest
+    - MLP
+    - Adaboost with DT
+    - XGBoost
+    - LightGBM
+    - SVC
 
+## # Route 2
+
+- Classic Models
+    - MLP
+    - CNN 1d
+    - LSTM
+    - GRU
+    - BiLSTM
+    - BiGRU
+- Sota Models
+    - DeepConvLSTM
+    - Res BiLSTM
+    - TCN
+    - Dilated TCN
+    - CNN BiLSTM
+    - CNN+LSTM+Self Attension
 
 # Reference
 
-[1] Gu, F., Chung, M.-H., Chignell, M., Valaee, S., Zhou, B., & Liu, X. (2022). A Survey on Deep Learning for Human Activity Recognition. ACM Computing Surveys, 54(8), 1–34. https://doi.org/10.1145/3472290
