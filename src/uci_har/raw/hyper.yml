@@ -1,73 +1,44 @@
-# yaml-language-server: $schema=./schema.json
-
-mlp: !MLPClf
-  lr: 0.001 
-  epochs: 2
-  batch_size: 32 
-  hidden_dims: [256, 128, 64, 32]
-  dropout: 0.2
-  train_log: true
-
-conv2d_3x3_3: !Conv2d_3x3_3_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  dropout: 0.2
-  train_log: true
-
-conv2d_3x3_1: !Conv2d_3x3_1_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  dropout: 0.2
-
-conv1d_3_3: !Conv1d_3x_3_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  dropout: 0.2
-
-conv1d_3_1: !Conv1d_3x_1_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  dropout: 0.2
-
-lstm: !LSTMClf
+mlp: !mlp
   lr: 0.01
-  epochs: 2
-  batch_size: 256
-  train_log: true
+  epochs: 100
+  batch_size: 64
+  hidden_dims: [256, 128, 64, 32, 16]
+  dropout: 0.2
+
+cnn1d: !cnn1d
+  lr: 0.001
+  epochs: 30
+  batch_size: 64
+  dropout: 0.2
+
+lstm: !lstm
+  lr: 0.001
+  epochs: 50
+  batch_size: 64
   hidden_dim: 32
-  num_layers: 3
-  dropout: 0
 
-gru: !GRUClf
+gru: !gru
   lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  hidden_dim: 64
-  num_layers: 3
-  dropout: 0.2
+  epochs: 20
+  batch_size: 64
+  hidden_dim: 32
 
-bilstm: !BiLSTMClf
+bilstm: !bilstm
   lr: 0.001
-  epochs: 2
-  batch_size: 128
-  hidden_dim: 64
-  num_layers: 3
-  dropout: 0.2
-  train_log: true
+  epochs: 50
+  batch_size: 64
+  hidden_dim: 32
 
-bigru: !BiGRUClf
+gru: !bigru
   lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  hidden_dim: 64
-  num_layers: 3
-  dropout: 0.2
+  epochs: 50
+  batch_size: 64
+  hidden_dim: 32
+
+res_bilstm: !res_bilstm
+  lr: 0.005
+  epochs: 20
+  batch_size: 64
+  l2: 0.005
+  hidden_dim: 32
+  block_num: 2

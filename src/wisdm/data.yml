@@ -1,0 +1,6 @@
+path: '/home/tibless/.cache/kagglehub/datasets/piyanit/wisdm-ar-v11/versions/1'
+draw_raw_data: false
+draw_processed_data:
+  isdraw: false
+  time_len: 128
+  tolerance: 20

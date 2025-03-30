@@ -2,44 +2,30 @@
 
 mlp: !MLPClf
   lr: 0.001 
-  epochs: 2
-  batch_size: 32 
+  epochs: 100
+  batch_size: 64
   hidden_dims: [256, 128, 64, 32]
   dropout: 0.2
   train_log: true
 
-conv2d_3x3_3: !Conv2d_3x3_3_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  dropout: 0.2
-  train_log: true
-
-conv2d_3x3_1: !Conv2d_3x3_1_Clf
-  lr: 0.001
-  epochs: 2
-  batch_size: 128
-  train_log: true
-  dropout: 0.2
-
 conv1d_3_3: !Conv1d_3x_3_Clf
   lr: 0.001
-  epochs: 2
-  batch_size: 128
+  epochs: 50
+  batch_size: 64
   train_log: true
   dropout: 0.2
 
 conv1d_3_1: !Conv1d_3x_1_Clf
   lr: 0.001
-  epochs: 2
-  batch_size: 128
+  epochs: 50
+  batch_size: 64
   train_log: true
   dropout: 0.2
 
 lstm: !LSTMClf
   lr: 0.01
-  epochs: 2
-  batch_size: 256
+  epochs: 50
+  batch_size: 64
   train_log: true
   hidden_dim: 32
   num_layers: 3
@@ -47,27 +33,27 @@ lstm: !LSTMClf
 
 gru: !GRUClf
   lr: 0.001
-  epochs: 2
-  batch_size: 128
+  epochs: 50
+  batch_size: 64
   train_log: true
-  hidden_dim: 64
+  hidden_dim: 32
   num_layers: 3
   dropout: 0.2
 
 bilstm: !BiLSTMClf
   lr: 0.001
-  epochs: 2
-  batch_size: 128
-  hidden_dim: 64
+  epochs: 50
+  batch_size: 64
+  hidden_dim: 32
   num_layers: 3
   dropout: 0.2
   train_log: true
 
 bigru: !BiGRUClf
   lr: 0.001
-  epochs: 2
-  batch_size: 128
+  epochs: 50
+  batch_size: 64
   train_log: true
-  hidden_dim: 64
+  hidden_dim: 32
   num_layers: 3
   dropout: 0.2

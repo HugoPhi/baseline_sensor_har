@@ -1,0 +1,56 @@
+[decision_tree]
+criterion = "gini"
+min_samples_split = 10
+min_samples_leaf = 3
+random_state = 239
+
+[random_forest]
+n_estimators = 50
+criterion = "gini"
+min_samples_split = 4
+min_samples_leaf = 1
+bootstrap = true
+random_state = 239
+
+[xgboost]
+n_estimators = 50
+max_depth = 5
+learning_rate = 0.1
+eval_metric = "logloss"
+random_state = 239
+
+[adaboost]
+n_estimators = 30
+learning_rate = 1.0
+random_state = 239
+estimator = "DecisionTreeClassifier(max_depth=7)"
+
+[svc]
+C = 0.4
+kernel = "rbf"
+degree = 3
+gamma = "scale"
+probability = true
+random_state = 239
+
+[lightbgm]
+n_estimators = 100
+max_depth = -1
+learning_rate = 0.1
+num_leaves = 30
+random_state = 239
+verbose = -1
+
+[mlp]
+hidden_layer_sizes = [ 256, 128, 64, 32,]
+activation = "relu"
+solver = "adam"
+alpha = 0.0001
+batch_size = "auto"
+learning_rate_init = 0.001
+max_iter = 500
+shuffle = true
+random_state = 239
+verbose = true
+early_stopping = true
+validation_fraction = 0.1

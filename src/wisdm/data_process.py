@@ -1,11 +1,20 @@
+import yaml
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-# import kagglehub
+import torch
+import kagglehub
 
-# path = kagglehub.dataset_download("piyanit/wisdm-ar-v11")
-path = '/home/tibless/.cache/kagglehub/datasets/piyanit/wisdm-ar-v11/versions/1'
+with open('./data.yml') as f:
+    config = yaml.safe_load(f)
+    path = config['path']
+    draw_raw_data = config['draw_raw_data']
+    draw_processed_data = config['draw_processed_data']
+
+
+if path is None:
+    path = kagglehub.dataset_download("piyanit/wisdm-ar-v11")
 print("Path to dataset files:", path)
 
 
@@ -16,6 +25,15 @@ action2id = {
     'Downstairs': 3,
     'Sitting': 4,
     'Standing': 5,
+}
+
+id2action = {
+    0: 'Walking',
+    1: 'Jogging',
+    2: 'Upstairs',
+    3: 'Downstairs',
+    4: 'Sitting',
+    5: 'Standing',
 }
 
 processed_list = []
@@ -86,10 +104,10 @@ with open(path + '/WISDM_ar_v1.1_raw.txt') as f:
             error while reading: 938218: [22, 3, 0, 0.0, 0.0, 0.0]
             error while reading: 1091332: [19, 3, 0, 0.0, 0.0, 0.0]
             '''
-            print(f'error while reading: {ix}: {line}')
+            # print(f'error while reading: {ix}: {line}')
             continue
         elif len(line) != 6:
-            print(f'error while reading: {ix}: {line}')
+            # print(f'error while reading: {ix}: {line}')
             continue
 
         processed_list.append(line)
@@ -107,17 +125,14 @@ Plot
 
 processed_list = processed_list.to_numpy()
 
-if True:
-    TIME_LEN = 128
-    START_FRAME = 2344
+if draw_raw_data:
+    # TIME_LEN = 128
+    # START_FRAME = 2344
     for usr in np.unique(processed_list[:, 0]):
-        print(f'>> user {usr}:')
         usr_list = processed_list[processed_list[:, 0] == usr]
 
         plt.figure(figsize=(18, 6))
         for act in np.unique(usr_list[:, 1]):
-            print(f'  >> action {act}:')
-
             act_list = usr_list[usr_list[:, 1] == act]
             # np.save(path + f'/processed/user_{usr}/action_{act}.npy', act_list)
 
@@ -181,11 +196,9 @@ def get_data(time_steps=128, tolerance=20):
 
     data_dict = {}
     for usr in np.unique(processed_list[:, 0]):
-        print(f'>> user {usr}:')
         usr_list = processed_list[processed_list[:, 0] == usr]
 
         for act in np.unique(usr_list[:, 1]):
-            print(f'  >> action {act}:')
 
             act_list = usr_list[usr_list[:, 1] == act]
             data_dict[f'u_{int(usr)}_a_{int(act)}'] = np.array(convert(usr, act, act_list)).reshape(-1, time_steps, 6)
@@ -193,9 +206,9 @@ def get_data(time_steps=128, tolerance=20):
     return data_dict
 
 
-if False:
-    TIME_LEN = 128
-    TOLERANCE = 20
+if draw_processed_data['isdraw']:
+    TIME_LEN = draw_processed_data['time_len']
+    TOLERANCE = draw_processed_data['tolerance']
     sum = 0
 
     data_dict = get_data(TIME_LEN, TOLERANCE)
@@ -236,17 +249,40 @@ Make Train, Test Dataset
 '''
 
 data_dict = get_data(
-    time_steps=128,
+    time_steps=64,
     tolerance=20
 )
 
+
+static_list = [0] * 6
+for k, v in data_dict.items():
+    user, action = k.split('_')[1], k.split('_')[3]
+
+    static_list[int(action)] += v.shape[0]
+
+for ix, num in enumerate(static_list):
+    print(f'Action {id2action[ix]}: {num}')
+
 data = np.concatenate(list(data_dict.values()), axis=0)  # (num, 128, 6)
 
-rate = 0.8
+rate = 0.7
 train, test = data[:int(data.shape[0] * rate)], data[int(data.shape[0] * rate):]
 
-X_train, y_train = train[:, :, 3:], train[:, :, 1]
-X_test, y_test = test[:, :, 3:], test[:, :, 1]
+X_train, y_train = np.transpose(train[:, :, 3:], (0, 2, 1)), train[:, 1, 1]
+X_test, y_test = np.transpose(test[:, :, 3:], (0, 2, 1)), test[:, 1, 1]
+
+
+'''
+Convert into Tensor
+'''
+
+X_train = torch.from_numpy(X_train).float()
+y_train = torch.from_numpy(y_train).long()
+X_test = torch.from_numpy(X_test).float()
+y_test = torch.from_numpy(y_test).long()
+
+y_train = torch.functional.F.one_hot(y_train, num_classes=6).float()
+# y_test = F.one_hot(y_test, num_classes=6).float()
 
 print(f'Shape of X_train: {X_train.shape}')
 print(f'Shape of y_train: {y_train.shape}')

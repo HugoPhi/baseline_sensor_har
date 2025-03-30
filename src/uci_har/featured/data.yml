@@ -1,0 +1,3 @@
+path: '/home/tibless/.cache/kagglehub/datasets/drsaeedmohsen/ucihar-dataset/versions/1'
+N_train: &Ntr 7532
+N_test: &Nte 2947

@@ -1,3 +1,4 @@
 [submodule "plugins/lrkit"]
 	path = plugins/lrkit
 	url = https://github.com/HugoPhi/lrkit.git
+  branch = numpy

@@ -1,9 +1,15 @@
+import yaml
 import kagglehub
 import pandas as pd
 import numpy as np
 
+with open('./data.yml') as f:
+    path = yaml.safe_load(f)['path']
+
 # 下载最新的数据集版本
-path = kagglehub.dataset_download("drsaeedmohsen/ucihar-dataset")
+if path is None:
+    path = kagglehub.dataset_download("drsaeedmohsen/ucihar-dataset")
+
 data_path = f"{path}/UCI-HAR Dataset"
 
 # 构建数据文件路径

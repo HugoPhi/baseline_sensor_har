@@ -12,4 +12,6 @@ exc = Executer(X_train, y_train, X_test, y_test,
                log=False,
                log_dir='./log/')
 
-exc.run_all(sort_by='accuracy', ascending=False)
+# exc.run_all(sort_by='accuracy', ascending=False)
+exc.run('mlp')
+print(exc.df)
